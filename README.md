@@ -1,8 +1,8 @@
 # Final Project Idea for the Consensys Blockchain Developer Bootcamp 2021
 
-####TL;DR: NFT Medical Prescriptions
+#### TL;DR: NFT Medical Prescriptions
 
-##Using NFTs to replace traditional prescriptions and thus eliminate prescription forging
+## Using NFTs to replace traditional prescriptions and thus eliminate prescription forging
 
 - Doctors can use their registered wallet to mint a NFT prescription, that gets transfered to the patient's wallet
 - Patients can then transfer (approve?) the prescription to a Pharmacist's wallet in exchange for the medication
@@ -10,8 +10,7 @@
 
 This way, any of the parties involved can check trustlessly if any given prescription is indeed valid or counterfeited by inspecting any of its signatures and its life cycle in the blockchain.
 
-
-###Circuit of life for the NFT:
+### Circuit of life for the NFT:
 
   *Doctor (Minting) -> Patient [-> H.I. Approval] -> Pharmacy -> Health Insurance*
 
@@ -27,7 +26,7 @@ Under Drug and Cosmetic Act, 1945, A Prescription should have following particul
 
 ---
 
-Data in the Token
+### Bare Minimum Data in the Token
 
 **(a)** Signed (digitally) by the (registered) doctor's wallet, date of issuance, minted by doctor
 - *Address* issuer
