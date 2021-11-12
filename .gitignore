@@ -11,7 +11,7 @@ truffle-config.js
 
 #React files
 client/node_modules
-src/contracts
+client/src/contracts
 .unusedFiles
 
 # dependencies

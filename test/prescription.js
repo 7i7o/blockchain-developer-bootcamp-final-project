@@ -72,6 +72,8 @@ contract("Rx", accounts => {
   let rx;
   let finalUri1 = '';
   let finalUri2 = '';
+  let initial = 0;
+  let final = 0;
 
   // Run this before each test
   beforeEach('setup contract for each test', async function () {
@@ -321,6 +323,9 @@ contract("Rx", accounts => {
     minter = ben;
     patient = david;
     rx = rx2;
+
+    // Initial balance of the second account
+    initial = await web3.eth.getBalance(minter._subjectId);
     
     // Try to generate prescription token URI
     try {
@@ -332,9 +337,9 @@ contract("Rx", accounts => {
     
     finalUri2 = uri;
     
-    console.log(`Generated tokenURI 1:\n${finalUri1}\n`);
-    console.log(`Generated tokenURI 2:\n${finalUri2}\n`);
-  
+    // Final balance
+    final = await web3.eth.getBalance(minter._subjectId);
+
   });
   
   it("...should NOT remove a subject without admin role.", async () => {
@@ -497,6 +502,13 @@ contract("Rx", accounts => {
     assert.notEqual(stored.name, source._name, `The value ${source._name} was not removed.`);
     assert.notEqual(stored.birthDate, source._birthDate, `The value ${source._birthDate} was not removed.`);
     assert.notEqual(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was not removed.`);
+
+    console.log(`Initial: ${initial.toString()}`);
+    console.log(`Final: ${final.toString()}`);
+    console.log(`Minting Total Cost: ${((initial-final)/(10**18)).toString()}`);
+
+    console.log(`Generated tokenURI 1:\n${finalUri1}\n`);
+    console.log(`Generated tokenURI 2:\n${finalUri2}\n`);
 
   });
 

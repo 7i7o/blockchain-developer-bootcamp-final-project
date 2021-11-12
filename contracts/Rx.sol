@@ -31,6 +31,9 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
 
     /** Begin of State Variables & Modifiers for final project */
 
+    uint256 constant MAX_KEY_LENGTH = 20;
+    uint256 constant MAX_VALUE_LENGTH = 62;
+
     /// @notice enum to reflect diferent states of the Prescription
     /// @param Draft reflects a Prescription that is not minted yet
     /// @param Minted reflects a freshly minted Prescription, not yet ready to be used by a patient in a Pharmacy
@@ -320,10 +323,12 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
     /// @param to The id of the subject (patient) recipient of the prescription
     /// @param _keys Text lines with the 'title' of each content of the prescription (max 17 characters each recommended)
     /// @param _values Text lines with the 'content' of the prescription (max 63 characters each recommended)
-    function mintPrescription(address to, string[12] memory _keys, string[12] memory _values)
+    function mintPrescription(address to, string[12] calldata _keys, string[12] calldata _values)
         public
         onlyRole(MINTER_ROLE)
-        isSubject(to) {
+        isSubject(to) 
+        // validateInputs(_keys, _values)
+        {
             require( (msg.sender != to) , 'Cannot mint NFT Prescription to yourself');
             RxData memory rx = RxData(Status.Draft, getSubject(to), getSubject(msg.sender), getDoctor(msg.sender), timestampToString(block.timestamp, '-'), _keys, _values);
             uint256 tokenId = _tokenIdCounter.current();
@@ -402,19 +407,20 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
                                 '<text x="118" y="750">License</text>'
                                 '<text x="118" y="780">Doctor Wallet</text>';
 
+            uint256 l = 0; // text length
+            uint256 y = 280; // Y Position
+            string memory text = ''; // text
+
             // Generate all the 'keys' text lines in the SVG
-            parts[1]  = (bytes(rx.keys[0]).length == 0)  ? '' : string(abi.encodePacked('<text x="118" y="280">',rx.keys[0],'</text>')) ;
-            parts[2]  = (bytes(rx.keys[1]).length == 0)  ? '' : string(abi.encodePacked('<text x="118" y="310">',rx.keys[1],'</text>')) ;
-            parts[3]  = (bytes(rx.keys[2]).length == 0)  ? '' : string(abi.encodePacked('<text x="118" y="340">',rx.keys[2],'</text>')) ;
-            parts[4]  = (bytes(rx.keys[3]).length == 0)  ? '' : string(abi.encodePacked('<text x="118" y="370">',rx.keys[3],'</text>')) ;
-            parts[5]  = (bytes(rx.keys[4]).length == 0)  ? '' : string(abi.encodePacked('<text x="118" y="400">',rx.keys[4],'</text>')) ;
-            parts[6]  = (bytes(rx.keys[5]).length == 0)  ? '' : string(abi.encodePacked('<text x="118" y="430">',rx.keys[5],'</text>')) ;
-            parts[7]  = (bytes(rx.keys[6]).length == 0)  ? '' : string(abi.encodePacked('<text x="118" y="460">',rx.keys[6],'</text>')) ;
-            parts[8]  = (bytes(rx.keys[7]).length == 0)  ? '' : string(abi.encodePacked('<text x="118" y="490">',rx.keys[7],'</text>')) ;
-            parts[9]  = (bytes(rx.keys[8]).length == 0)  ? '' : string(abi.encodePacked('<text x="118" y="510">',rx.keys[8],'</text>')) ;
-            parts[10] = (bytes(rx.keys[9]).length == 0)  ? '' : string(abi.encodePacked('<text x="118" y="540">',rx.keys[9],'</text>')) ;
-            parts[11] = (bytes(rx.keys[10]).length == 0) ? '' : string(abi.encodePacked('<text x="118" y="570">',rx.keys[10],'</text>')) ;
-            parts[12] = (bytes(rx.keys[11]).length == 0) ? '' : string(abi.encodePacked('<text x="118" y="600">',rx.keys[11],'</text>')) ;
+            for (uint256 i = 0; i < rx.keys.length; i++) {
+                text = rx.keys[i];
+                l = bytes(text).length;
+                require( l < MAX_KEY_LENGTH, 'Key exceeds max length (19)' );
+                if ( l > 0 ){
+                    parts[i+1] = string(abi.encodePacked('<text x="118" y="',Strings.toString(y),'">',text,'</text>'));
+                }
+                y += 30;
+            }
 
             // SVG 'change font' separator
             parts[13] = '</g><g font-family="Courier" font-weight="bold">';
@@ -445,21 +451,22 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
                 '<text x="128" y="780">',Strings.toHexString(uint256(uint160(rx.doctor.subjectId)), 20),'</text>'
             ));
 
+            y = 280;
             // Generate all the 'values' text lines in the SVG
-            parts[17] = (bytes(rx.values[0]).length == 0) ?  '' : string(abi.encodePacked('<text x="128" y="280">',rx.values[0],'</text>')) ;
-            parts[18] = (bytes(rx.values[1]).length == 0) ?  '' : string(abi.encodePacked('<text x="128" y="310">',rx.values[1],'</text>')) ;
-            parts[19] = (bytes(rx.values[2]).length == 0) ?  '' : string(abi.encodePacked('<text x="128" y="340">',rx.values[2],'</text>')) ;
-            parts[20] = (bytes(rx.values[3]).length == 0) ?  '' : string(abi.encodePacked('<text x="128" y="370">',rx.values[3],'</text>')) ;
-            parts[21] = (bytes(rx.values[4]).length == 0) ?  '' : string(abi.encodePacked('<text x="128" y="400">',rx.values[4],'</text>')) ;
-            parts[22] = (bytes(rx.values[5]).length == 0) ?  '' : string(abi.encodePacked('<text x="128" y="430">',rx.values[5],'</text>')) ;
-            parts[23] = (bytes(rx.values[6]).length == 0) ?  '' : string(abi.encodePacked('<text x="128" y="460">',rx.values[6],'</text>')) ;
-            parts[24] = (bytes(rx.values[7]).length == 0) ?  '' : string(abi.encodePacked('<text x="128" y="490">',rx.values[7],'</text>')) ;
-            parts[25] = (bytes(rx.values[8]).length == 0) ?  '' : string(abi.encodePacked('<text x="128" y="510">',rx.values[8],'</text>')) ;
-            parts[26] = (bytes(rx.values[9]).length == 0) ?  '' : string(abi.encodePacked('<text x="128" y="540">',rx.values[9],'</text>')) ;
-            parts[27] = (bytes(rx.values[10]).length == 0) ? '' : string(abi.encodePacked('<text x="128" y="570">',rx.values[10],'</text>')) ;
-            parts[28] = (bytes(rx.values[11]).length == 0) ? '' : string(abi.encodePacked('<text x="128" y="600">',rx.values[11],'</text>')) ;
+            for (uint256 i = 0; i < rx.values.length; i++) {
+                text = rx.values[i];
+                l = bytes(text).length;
+                require( l < MAX_VALUE_LENGTH, 'Value exceeds max length (61)' );
+                if ( l > 0 ){
+                    parts[i+17] = string(abi.encodePacked('<text x="128" y="',Strings.toString(y),'">',text,'</text>'));
+                }
+                y += 30;
+            }
     
-            parts[29] = '</g><g opacity="0.6"><circle fill="darkblue" cx="566" cy="754.4" r="7.5"/><path fill="red" d="m580.4 761h4l-15,24h-4z"/><path fill="darkred" d="m565.4 761h4l15,24h-4z"/><path fill="blue" d="m558 749v24h15z"/></g></svg>';
+            parts[29] = '</g>'
+                        // Small logo at the bottom that can be commented out
+                        '<g opacity="0.6"><circle fill="darkblue" cx="566" cy="754.4" r="7.5"/><path fill="red" d="m580.4 761h4l-15,24h-4z"/><path fill="darkred" d="m565.4 761h4l15,24h-4z"/><path fill="blue" d="m558 749v24h15z"/></g>'
+                        '</svg>';
 
             string memory output = string(abi.encodePacked(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7]));
             output = string(abi.encodePacked(output, parts[8], parts[9], parts[10], parts[11], parts[12], parts[13], parts[14], parts[15]));
