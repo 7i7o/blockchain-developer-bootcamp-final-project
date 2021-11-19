@@ -21,6 +21,8 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
     using Counters for Counters.Counter;
 
     /// @notice Role definition for Minter
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    /// @notice Role definition for Minter
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     /// @notice Role definition for Burner
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
@@ -33,6 +35,11 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
 
     uint256 constant MAX_KEY_LENGTH = 20;
     uint256 constant MAX_VALUE_LENGTH = 62;
+
+    uint256 constant RX_LINES = 12;
+    uint256 constant LINE_PADDING = 30;
+
+    string constant DATE_SEPARATOR = '-';
 
     /// @notice enum to reflect diferent states of the Prescription
     /// @param Draft reflects a Prescription that is not minted yet
@@ -49,8 +56,9 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
     /// @param homeAddress should contain string with the home address of the subject
     struct Subject {
         address subjectId;
+        // string birthDate;
+        uint256 birthDate;
         string name;
-        string birthDate;
         string homeAddress;
     }
 
@@ -88,12 +96,12 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
     /// @dev @param pharmacistSubjectId Possible future feature: Id of the pharmacist to assign a Pharmacist on the moment of Prescribing
     struct RxData {
         Status status;
+        uint256 date;
         Subject patient;
         Subject doctorSubject;
         Doctor doctor;
-        string date;
-        string[12] keys;
-        string[12] values;
+        string[RX_LINES] keys;
+        string[RX_LINES] values;
         // address pharmacistSubjectId;
     }
 
@@ -105,6 +113,9 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
 
     /// @notice this mapping holds all the pharmacists registered in the contract
     mapping ( address => Pharmacist ) private pharmacists;
+
+    /// @notice this mapping holds all the prescriptions minted in the contract
+    mapping (uint256 => RxData) private rxs;
 
     /// @dev Modifier that checks that an account is actually a registered subject
     modifier isSubject(address _subjectId) {
@@ -165,10 +176,17 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
 
     /// @notice constructor for NFT Prescriptions contract
     /// @dev Using ERC721 default constructor with "Prescription" and "Rx" as Name and Symbol for the tokens
-    /// @dev We set up the contract creator (msg.sender) with the DEFAULT_ADMIN_ROLE to manage all the other Roles
+    /// @dev We set up the contract creator (msg.sender) with the ADMIN_ROLE to manage all the other Roles
     /// @dev We increment the counter in the constructor to start Ids in 1, keeping Id 0 (default for uints in solidity) to signal that someone doesn't have any NFTs
     constructor() ERC721("Rx", "Rx") {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+
+        // _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);  // ADMIN role to manage all 3 roles
+        _setRoleAdmin(MINTER_ROLE, ADMIN_ROLE);
+        _setRoleAdmin(BURNER_ROLE, ADMIN_ROLE);
+
+        grantRole(ADMIN_ROLE, msg.sender);
+
         // _setupRole(MINTER_ROLE, msg.sender); // MINTER_ROLE reserved for Doctors only
         // _setupRole(BURNER_ROLE, msg.sender); // BURNER_ROLE reserved for Pharmacists only
 
@@ -177,11 +195,29 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
 
     /// @dev function override required by solidity
     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) onlyRole(BURNER_ROLE) {
+        delete rxs[tokenId];
         super._burn(tokenId);
     }
 
-    /// @dev function override required by solidity
+    /// @dev TokenURI generated on the fly from stored data (function override required by solidity)  
     function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+        require(_exists(tokenId), "ERC721URIStorage: URI query for nonexistent token");
+
+        // Create the tokenURI on the fly from stored data in the contract
+        string memory _tokenURI = _generateTokenURI(tokenId);
+        
+        // string memory _tokenURI = _tokenURIs[tokenId];
+        string memory base = _baseURI();
+
+        // If there is no base URI, return the token URI.
+        if (bytes(base).length == 0) {
+            return _tokenURI;
+        }
+        // If both are set, concatenate the baseURI and tokenURI (via abi.encodePacked).
+        if (bytes(_tokenURI).length > 0) {
+            return string(abi.encodePacked(base, _tokenURI));
+        }
+
         return super.tokenURI(tokenId);
     }
 
@@ -191,6 +227,24 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
     }
 
     /** Begin of implementation of functions for final project */
+
+    /// @notice Function to add an admin account
+    /// @param to Address of the account to grant admin role
+    function addAdmin(address to) public onlyRole(ADMIN_ROLE) {
+        grantRole(ADMIN_ROLE, to);
+    }
+
+    /// @notice Function to remove an admin account
+    /// @param to Address of the account to remove admin role
+    function removeAdmin(address to) public onlyRole(ADMIN_ROLE) {
+        revokeRole(ADMIN_ROLE, to);
+    }
+
+    /// @notice Function to check if someone has admin role
+    /// @param to address to check for admin role privilege
+    function isAdmin(address to) public view returns (bool) {
+        return hasRole(ADMIN_ROLE, to);
+    }
 
     /// @notice Function to retrieve a Subject
     /// @param _subjectId the registered address of the subject to retrieve
@@ -224,19 +278,19 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
 
     /// @notice Function to add/replace a Subject allowed to receive/hold NFT Prescriptions
     /// @param _subjectId is the registered address of the subject (approved for holding NFT Prescriptions)
+    /// @param _birthDate is the subjects' date of birth, in seconds, from UNIX Epoch (1970-01-01)
     /// @param _name is the subject's full name
-    /// @param _birthDate is the subjects' date of birth
     /// @param _homeAddress is the subject's legal home address
     /// @return the ethereum address of the subject that was registered in the contract
-    /// @dev Only DEFAULT_ADMIN_ROLE users are allowed to modify subjects
-    function setSubjectData(address _subjectId, string calldata _name, string calldata _birthDate, string calldata _homeAddress)
+    /// @dev Only ADMIN_ROLE users are allowed to modify subjects
+    function setSubjectData(address _subjectId, uint256 _birthDate, string calldata _name, string calldata _homeAddress)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(ADMIN_ROLE)
         returns (address) {
             require (_subjectId != address(0), "Wallet Address cannot be 0x0");
             // Subject memory newSubject = Subject(_subjectId, _name, _birthDate, _homeAddress);
             // subjects[_subjectId] = newSubject;
-            subjects[_subjectId] = Subject(_subjectId, _name, _birthDate, _homeAddress);
+            subjects[_subjectId] = Subject(_subjectId, _birthDate, _name, _homeAddress);
             return subjects[_subjectId].subjectId;
     }
 
@@ -248,7 +302,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
     /// @return the ethereum address of the doctor that was registered in the contract
     function setDoctorData(address _subjectId, string calldata _degree, string calldata _license) //, address[] calldata _workplaces)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(ADMIN_ROLE)
         isSubject(_subjectId)
         returns (address) {
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isSubject()
@@ -269,7 +323,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
     /// @return the ethereum address of the pharmacist that was registered in the contract
     function setPharmacistData(address _subjectId, string calldata _degree, string calldata _license) //, address[] calldata _workplaces)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(ADMIN_ROLE)
         isSubject(_subjectId)
         returns (address) {
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isSubject()
@@ -284,10 +338,10 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
 
     /// @notice Function to remove a registered Subject 
     /// @param _subjectId is the registered address of the subject to remove
-    /// @dev Only DEFAULT_ADMIN_ROLE users are allowed to remove subjects
+    /// @dev Only ADMIN_ROLE users are allowed to remove subjects
     function removeSubject(address _subjectId)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(ADMIN_ROLE)
         isSubject(_subjectId)
         isNotDoctor(_subjectId)
         isNotPharmacist(_subjectId) {
@@ -297,10 +351,10 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
 
     /// @notice Function to remove a registered Doctor
     /// @param _subjectId is the registered address of the doctor to remove
-    /// @dev Only DEFAULT_ADMIN_ROLE users are allowed to remove doctors
+    /// @dev Only ADMIN_ROLE users are allowed to remove doctors
     function removeDoctor(address _subjectId)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(ADMIN_ROLE)
         isDoctor(_subjectId) {
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isDoctor()
             revokeRole(MINTER_ROLE, _subjectId);
@@ -309,40 +363,59 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
 
     /// @notice Function to remove a registered Pharmacist
     /// @param _subjectId is the registered address of the pharmacist to remove
-    /// @dev Only DEFAULT_ADMIN_ROLE users are allowed to remove pharmacists
+    /// @dev Only ADMIN_ROLE users are allowed to remove pharmacists
     function removePharmacist(address _subjectId)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(ADMIN_ROLE)
         isPharmacist(_subjectId) {
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isPharmacist()
             revokeRole(BURNER_ROLE, _subjectId);
             delete pharmacists[_subjectId];
     }
 
+    /// @notice Function to verify string length and validate data input
+    /// @param maxLength Maximum string length
+    function _validateStrings(uint256 maxLength, string[RX_LINES] calldata stringArray) internal pure returns (bool) {
+        for (uint256 i = 0; i < RX_LINES; i++) {
+            if ( bytes(stringArray[i]).length >= maxLength) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /// @notice Funtion to mint a Prescription. Should be called only by a Doctor (has MINTER_ROLE)
     /// @param to The id of the subject (patient) recipient of the prescription
-    /// @param _keys Text lines with the 'title' of each content of the prescription (max 17 characters each recommended)
-    /// @param _values Text lines with the 'content' of the prescription (max 63 characters each recommended)
-    function mintPrescription(address to, string[12] calldata _keys, string[12] calldata _values)
+    /// @param _keys Text lines with the 'title' of each content of the prescription (max 19 characters each)
+    /// @param _values Text lines with the 'content' of the prescription (max 61 characters each)
+    /// @dev Does NOT store a tokenURI. It stores Prescription data on contract and tokenURI is generated on the fly afterwards
+    function mint(address to, string[RX_LINES] calldata _keys, string[RX_LINES] calldata _values)
         public
         onlyRole(MINTER_ROLE)
         isSubject(to) 
         // validateInputs(_keys, _values)
         {
             require( (msg.sender != to) , 'Cannot mint NFT Prescription to yourself');
-            RxData memory rx = RxData(Status.Draft, getSubject(to), getSubject(msg.sender), getDoctor(msg.sender), timestampToString(block.timestamp, '-'), _keys, _values);
+ 
+            require( _validateStrings( MAX_KEY_LENGTH, _keys ) , 'Key exceeds max length (19)' );
+            require( _validateStrings( MAX_VALUE_LENGTH, _values ) , 'Value exceeds max length (61)' );
+
             uint256 tokenId = _tokenIdCounter.current();
             _tokenIdCounter.increment();
             super._safeMint(to, tokenId);
-            _setTokenURI(tokenId, _generatePrescriptionURI(tokenId, rx));
+            rxs[tokenId] = RxData(Status.Draft, block.timestamp, getSubject(to), getSubject(msg.sender), getDoctor(msg.sender), _keys, _values);
     }
 
+
     /// @notice Function to generate a Base64 encoded JSON, that includes a SVG to be used as the token URI
-    /// @param rx A Prescription Object containing all that we need to create the SVG
-    function _generatePrescriptionURI(uint256 tokenId, RxData memory rx)
+    /// @param tokenId The tokenId containing stored data to generate the token URI
+    function _generateTokenURI(uint256 tokenId)
         internal
         view
         returns (string memory uri) {
+            RxData memory rx = rxs[tokenId];
+            string memory stringDate = timestampToString(rx.date, DATE_SEPARATOR);
+            string memory stringBirthdate = timestampToString(rx.patient.birthDate, DATE_SEPARATOR);
 
             // json strings with a Base64 encoded image (SVG) inside
             string[24] memory jsonParts;
@@ -357,7 +430,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
                                 '{"trait_type":"PatientName","value":"';
             jsonParts[8]  =          rx.patient.name;
             jsonParts[9]  =     '"},{"trait_type":"Patient Birthdate","value":"';
-            jsonParts[10] =         rx.patient.birthDate;
+            jsonParts[10] =         stringBirthdate;
             jsonParts[11] =     '"},{"trait_type":"Doctor Name","value":"';
             jsonParts[12] =         rx.doctorSubject.name;
             jsonParts[13] =     '"},{"trait_type":"Doctor Degree","value":"';
@@ -365,7 +438,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
             jsonParts[16] =     '"},{"trait_type":"Doctor License","value":"';
             jsonParts[17] =         rx.doctor.license;
             jsonParts[18] =     '"},{"trait_type":"RX Date","value":"';
-            jsonParts[19] =         rx.date;
+            jsonParts[19] =         stringDate;
             jsonParts[20] =     '"}]';
             jsonParts[21] = ',"image": "data:image/svg+xml;base64,';
             jsonParts[22] =     Base64.encode(bytes( _generateSVG(tokenId, rx) ));
@@ -385,6 +458,10 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
         internal
         view
         returns (string memory svg) {
+
+            string memory stringDate = timestampToString(rx.date, DATE_SEPARATOR);
+            string memory stringBirthdate = timestampToString(rx.patient.birthDate, DATE_SEPARATOR);
+            
             string[30] memory parts;  // Should have 30: 1 header + 12 keys + 1 font separator + 1 Patient values + 1 date value + 1 Doctor values + 12 values + 1 Footer
 
             // SVG Header
@@ -407,19 +484,17 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
                                 '<text x="118" y="750">License</text>'
                                 '<text x="118" y="780">Doctor Wallet</text>';
 
-            uint256 l = 0; // text length
+            // uint256 l = 0; // text length
             uint256 y = 280; // Y Position
             string memory text = ''; // text
 
             // Generate all the 'keys' text lines in the SVG
-            for (uint256 i = 0; i < rx.keys.length; i++) {
+            for (uint256 i = 0; i < RX_LINES; i++) {
                 text = rx.keys[i];
-                l = bytes(text).length;
-                require( l < MAX_KEY_LENGTH, 'Key exceeds max length (19)' );
-                if ( l > 0 ){
+                if ( bytes(text).length > 0 ){
                     parts[i+1] = string(abi.encodePacked('<text x="118" y="',Strings.toString(y),'">',text,'</text>'));
                 }
-                y += 30;
+                y += LINE_PADDING;
             }
 
             // SVG 'change font' separator
@@ -428,7 +503,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
             // Generate all the patient SVG lines
             parts[14] = string(abi.encodePacked(
                 '<text x="128" y="30">',rx.patient.name,'</text>',
-                '<text x="128" y="60">',rx.patient.birthDate,'</text>',
+                '<text x="128" y="60">',stringBirthdate,'</text>',
                 '<text x="128" y="90">',rx.patient.homeAddress,'</text>',
                 '<text x="128" y="120">',Strings.toHexString(uint256(uint160(rx.patient.subjectId)), 20),'</text>'
             ));
@@ -436,7 +511,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
             // Generate the date and Rx# SVG line
             parts[15] = string(abi.encodePacked(
                 '<text x="128" y="660">',
-                    rx.date,
+                    stringDate,
                 '</text>'
                 '<text x="585" y="660" text-anchor="end" font-style="italic">'
                     ,name(),'# ',Strings.toString(tokenId),
@@ -453,14 +528,12 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl, DateTime
 
             y = 280;
             // Generate all the 'values' text lines in the SVG
-            for (uint256 i = 0; i < rx.values.length; i++) {
+            for (uint256 i = 0; i < RX_LINES; i++) {
                 text = rx.values[i];
-                l = bytes(text).length;
-                require( l < MAX_VALUE_LENGTH, 'Value exceeds max length (61)' );
-                if ( l > 0 ){
+                if ( bytes(text).length > 0 ){
                     parts[i+17] = string(abi.encodePacked('<text x="128" y="',Strings.toString(y),'">',text,'</text>'));
                 }
-                y += 30;
+                y += LINE_PADDING;
             }
     
             parts[29] = '</g>'
