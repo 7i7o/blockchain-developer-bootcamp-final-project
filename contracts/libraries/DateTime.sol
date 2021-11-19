@@ -2,9 +2,12 @@
 pragma solidity >=0.8.0; // Modified for and updated pragma solidity declaration
 // pragma solidity ^0.4.16;
 
+import '@openzeppelin/contracts/utils/Strings.sol';
+
+
 /// @notice Date and Time utilities for ethereum contracts
 /// @author Piper Merriam https://github.com/pipermerriam
-contract DateTime {
+library DateTime {
 
         struct DateTimeStruct {
                 uint16 year;
@@ -24,6 +27,29 @@ contract DateTime {
         uint constant MINUTE_IN_SECONDS = 60;
 
         uint16 constant ORIGIN_YEAR = 1970;
+
+        string constant DATE_SEPARATOR = '-';
+
+        /// @notice Function that returns a string (YYYY-MM-DD) from a timestamp
+        /// @param dt uint256 timestamp (commonly block.timestamp)
+        function timestampToString(uint256 dt) public pure returns (string memory) {
+                return timestampToString(dt, DATE_SEPARATOR);
+        }
+
+
+        /// @notice Function that returns a string (YYYY-MM-DD) from a timestamp
+        /// @param dt uint256 timestamp (commonly block.timestamp)
+        /// @param separator string with the separator
+        function timestampToString(uint256 dt, string memory separator) public pure returns (string memory) {
+                DateTimeStruct memory date = parseTimestamp(dt);
+                return string(abi.encodePacked(
+                Strings.toString(date.year),
+                separator,
+                Strings.toString(date.month),
+                separator,
+                Strings.toString(date.day)
+                ));
+        }
 
         function isLeapYear(uint16 year) public pure returns (bool) {
                 if (year % 4 != 0) {
