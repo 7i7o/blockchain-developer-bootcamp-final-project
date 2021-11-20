@@ -673,8 +673,8 @@ contract("Rx", accounts => {
 
   });
 
-    // Console logs inside a test to be able to print out this at the end
-    it("...should print final logs to console.", async () => {
+  // Console logs inside a test to be able to print out this at the end
+  it("...should print final logs to console.", async () => {
 
     // console.log(`Initial: ${initialGas1.toString()}`);
     // console.log(`Final: ${finalGas1.toString()}`);
