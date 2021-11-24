@@ -1,73 +1,241 @@
-import React, { Component } from "react";
-import SimpleStorageContract from "./contracts/SimpleStorage.json";
-import getWeb3 from "./getWeb3";
+import "./styles/App.css";
+import React, { useEffect, useState } from "react";
+import Rx from "./contracts/Rx.json";
+import Web3 from "web3";
 
-import "./App.css";
+import { Alert, Button, Layout } from 'antd';
 
-class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
 
-  componentDidMount = async () => {
+// import NewSubjectDrawer from './Components/NewSubjectDrawer'
+// import NewDoctorDrawer from './Components/NewDoctorDrawer'
+// import NewPharmacistDrawer from './Components/NewPharmacistDrawer'
+import Landing from './Components/Landing'
+
+const PASSIVE_METHOD = 'eth_accounts'
+const ACTIVE_METHOD = 'eth_requestAccounts'
+const { Header } = Layout;
+
+const App = () => {
+
+
+  // const [web3, setWeb3] = useState(null);
+  const [account, setAccount] = useState("");
+  const [contract, setContract] = useState("");
+  const [message, setMessage] = useState("");
+  const [visible, setVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [visibleError, setVisibleError] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [userSubjectData, setUserSubjectData] = useState(null);
+  const [userDoctorData, setUserDoctorData] = useState(null);
+  const [userPharmacistData, setUserPharmacistData] = useState(null);
+
+
+  const handleClose = () => {
+    setVisible(false);
+    setMessage('');
+  };
+
+  const handleCloseError = () => {
+    setVisibleError(false);
+    setErrorMessage('');
+  };
+
+  const showMessage = message => {
+    setMessage(message);
+    setVisible(true);
+  }
+
+  const showError = error => {
+    setErrorMessage(error);
+    setVisibleError(true);
+  }
+
+  // This runs our function when the page loads.
+  useEffect(() => {
+    getWeb3(PASSIVE_METHOD);
+  }, [])
+
+  if (window.ethereum) {
+    window.ethereum.on('chainChanged', () => window.location.reload());
+    window.ethereum.on('accountsChanged', () => window.location.reload());
+  }
+  
+  // Helper function that runs on page load
+  const getWeb3 = async method => {
+    if (!window.ethereum) {
+      console.log('No ETH browser extension detected.');
+      return;
+    } else {
+      console.log('ETH browser extension detected!'); //, window.ethereum)
+    }
     try {
-      // Get network provider and web3 instance.
-      const web3 = await getWeb3();
-
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
-
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
-      const instance = new web3.eth.Contract(
-        SimpleStorageContract.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.runExample);
+      let accounts = await window.ethereum.request({ method });
+      if (!accounts.length) {
+        console.log('Found NO authorized accounts, we should render a Connect Wallet Button');
+      } else {
+        const authorizedAccount = accounts[0];
+        console.log('Found authorized account: ', authorizedAccount);
+        setAccount(authorizedAccount);
+      }
     } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
+      console.log(error);
+    }
+  };
+  
+  const connectWallet = async () => {
+    try {
+      await getWeb3(ACTIVE_METHOD); // This prompts the metamask window
+    } catch (error) {
+      showError('Failed to load web3, accounts, or contract. Check console for details.');
       console.error(error);
     }
-  };
-
-  runExample = async () => {
-    const { accounts, contract } = this.state;
-
-    // Stores a given value, 5 by default.
-    await contract.methods.set(5).send({ from: accounts[0] });
-
-    // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
-
-    // Update state with the result.
-    this.setState({ storageValue: response });
-  };
-
-  render() {
-    if (!this.state.web3) {
-      return <div>Loading Web3, accounts, and contract...</div>;
-    }
-    return (
-      <div className="App">
-        <h1>Good to Go!</h1>
-        <p>Your Truffle Box is installed and ready.</p>
-        <h2>Smart Contract Example</h2>
-        <p>
-          If your contracts compiled and migrated successfully, below will show
-          a stored value of 5 (by default).
-        </p>
-        <p>
-          Try changing the value stored on <strong>line 42</strong> of App.js.
-        </p>
-        <div>The stored value is: {this.state.storageValue}</div>
-      </div>
-    );
   }
+  
+  // This runs our function when the account is updated.
+  useEffect(() => {
+    finishWeb3Setup()
+  }, [account])
+  
+  const finishWeb3Setup = async () => {
+    console.log('Saved authorized account: ', account);
+    if (!account) {
+      setContract(null);
+    } else {
+      const web3Object = new Web3(window.ethereum);
+      const networkId = await window.ethereum.request({ method: 'net_version' });
+      const deployedNetwork = Rx.networks[networkId];
+      if (deployedNetwork) {
+        const instance = new web3Object.eth.Contract(Rx.abi, deployedNetwork.address);
+        setContract(instance);
+      }
+    }
+  }
+
+  // This runs our function when the contract is updated (we have a connection).
+  useEffect(() => {
+    getUserState()
+  }, [contract])
+  
+  const getUserState = () => {
+    if (contract) {
+      checkIsAdmin();
+      getUserSubjectData();
+      getUserDoctorData();
+      getUserPharmacistData();
+    }
+  }
+
+  const checkIsAdmin = async () => {
+    // console.log(`Trying to call contract with account: "${account}"`);
+    let result = false;
+    try {
+      result = await contract.methods.isAdmin(account).call({from: account});
+    } catch (error) {
+      console.log(error);
+    }
+    if (result) {
+        setIsAdmin(true);
+        console.log("isAdmin");
+    } else {
+        setIsAdmin(false);
+        console.log("isNotAdmin");
+    }
+  }
+
+  const getUserSubjectData = async () => {
+    // console.log(`Trying to call contract with account: "${account}"`);
+    let result = null;
+    try {
+      result = await contract.methods.getSubject(account).call({from: account});
+    } catch (error) {
+      console.log(error);
+    }
+    if (result) {
+        setUserSubjectData(result);
+        console.log(`Subject Data: ${result}`);
+    } else {
+        setUserSubjectData(null);
+        console.log("isNotSubject");
+    }
+  }
+
+  const getUserDoctorData = async () => {
+    // console.log(`Trying to call contract with account: "${account}"`);
+    let result = null;
+    try {
+      result = await contract.methods.getDoctor(account).call({from: account});
+    } catch (error) {
+      console.log(error);
+    }
+    if (result) {
+        setUserDoctorData(result);
+        console.log(`Doctor Data: ${result}`);
+    } else {
+        setUserDoctorData(null);
+        console.log("isNotDoctor");
+    }
+  }
+
+  const getUserPharmacistData = async () => {
+    // console.log(`Trying to call contract with account: "${account}"`);
+    let result = null;
+    try {
+      result = await contract.methods.getPharmacist(account).call({from: account});
+    } catch (error) {
+      console.log(error);
+    }
+    if (result) {
+        setUserPharmacistData(result);
+        console.log(`Pharmacist Data: ${result}`);
+    } else {
+        setUserPharmacistData(null);
+        console.log("isNotPharmacist");
+    }
+  }
+
+  const renderConnectButton = () => (
+    <Layout>
+      {/* <Header>Header</Header> */}
+      <Header>
+            <Button onClick={connectWallet}>
+              Connect to Wallet
+            </Button>
+      </Header>
+      {/* <Footer>Footer</Footer> */}
+    </Layout>
+  );
+
+  const props = { showMessage, showError, account, contract, isAdmin, userSubjectData, userDoctorData, userPharmacistData };
+
+  const renderLanding = () => (
+    <Landing parentProps={props} />
+  )
+
+  return (
+    <div className="App">
+      {visible ? (
+        <Alert message={message} type="info" closable afterClose={handleClose} />
+      ) : ""}
+      {visibleError ? (
+        <Alert message={errorMessage} type="error" closable afterClose={handleCloseError} />
+      ) : ""}
+      {/* <Alert message="Success Text" type="success" /> */}
+      {/* <Alert message={message} type="info" closable /> */}
+      {/* <Alert message="Warning Text" type="warning" /> */}
+      {/* <Alert message={errorMessage} type="error" closable /> */}
+      {/* <h2>Smart Contract Example</h2> */}
+      {/* { !web3 ? 
+        setMessage("Loading Web3 Extension...")
+      : setMessage("")
+      && ( */}
+      {(!account?
+          renderConnectButton()
+          : renderLanding()
+        )
+      }
+    </div>
+  );
 }
 
 export default App;
