@@ -4,10 +4,7 @@ import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { Button, Typography, Row, Col, Space } from 'antd';
 
-
 import Rx from "../contracts/Rx.json";
-
-// const { Text, Link } = Typography;
 
 // const NETWORKS = {
 //   1: "Ethereum Mainnet",
@@ -20,13 +17,7 @@ import Rx from "../contracts/Rx.json";
 // const CONTRACT_ADDRESS = '0x668931aE15C2062BC5002306E1FeED42abdcEf8F' // on Rinkeby
 const NETWORK_ID = 4; // Rinkeby
 
-
 const ConnectWallet = (props) => {
-
-    // These should be passed from parent as props
-    // const [account, setAccount] = useState('')
-    // const [props.connection, props.setConnection] = useState(false)
-    // const [contract, setContract] = useState(null)
 
     const [loggedIn, setLoggedIn] = useState(false)
 
@@ -89,17 +80,6 @@ const ConnectWallet = (props) => {
         setLoggedIn(true);
     }  
 
-    // useEffect(() => {
-    //   logConnectionStatus()
-    // }, [loggedIn])
-
-    // const logConnectionStatus = () => {
-    //   console.log(`Connection: ${props.connection}`);
-    //   console.log(`Account: ${props.account}`);
-    //   console.log(`Contract: ${props.contract}`);
-    //   console.log(`Logged In? : ${loggedIn}`);
-    // }
-
     async function signOut() {
       setLoggedIn(false);  
       props.setContract(null);
@@ -109,11 +89,6 @@ const ConnectWallet = (props) => {
               <Col span={4} style={{ display: 'flex', justifyContent: 'left', alignItems: 'baseline', maxHeight: 30 }}>
                 <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 120 120">
                   <g opacity="0.6">
-                    {/* <g> */}
-                    {/* <circle fill="darkblue" cx="566" cy="754.4" r="7.5"/> */}
-                    {/* <path fill="red" d="m580.4 761h4l-15,24h-4z"/> */}
-                    {/* <path fill="darkred" d="m565.4 761h4l15,24h-4z"/> */}
-                    {/* <path fill="blue" d="m558 749v24h15z"/> */}
                     <circle fill="darkblue" cx="8" cy="8" r="7.5"/>
                     <path fill="red" d="m22.4 14.6h4l-15,24h-4z"/>
                     <path fill="darkred" d="m7.4 14.6h4l15,24h-4z"/>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Drawer, Form, Button, Input, Space } from 'antd';
+import { Drawer, Form, Button, Input, Space, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import SubjectData from './SubjectData';
@@ -8,16 +8,14 @@ import DocPhData from './DocPhData';
 const NewDocPhDrawer = (props) => {
 
   const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [validAccount, setValidAccount] = useState(false);
+  const [searchableSubjectId, setSearchableSubjectId] = useState("");
   const [lastAccountQueried, setLastAccountQueried] = useState("");
   const [existsSubject, setExistsSubject] = useState(false);
   const [existsDoctor, setExistsDoctor] = useState(false);
   const [existsPharmacist, setExistsPharmacist] = useState(false);
-
-  // const [userSubjectData, setUserSubjectData] = useState({ subjectId: 0, name: '', birthDate: new Date(0), homeAddress: ''});
-  const [loading, setLoading] = useState(false);
-
-  const [searchableSubjectId, setSearchableSubjectId] = useState("");
 
   const [form] = Form.useForm();
 
@@ -40,6 +38,20 @@ const NewDocPhDrawer = (props) => {
       return Promise.reject(new Error('Account must be a valid Ethereum Address!'));
   }
 
+  const getSubjectInfo = () => {
+    let subjectId = form.getFieldValue("accountAddress");
+    if (ethers.utils.isAddress(subjectId)) {
+      setLastAccountQueried(subjectId);
+      setSearchableSubjectId(subjectId);
+    } else {
+      const zeroAddress = "0x0000000000000000000000000000000000000000";
+      if (lastAccountQueried !== zeroAddress) {
+        setLastAccountQueried(zeroAddress);
+        setSearchableSubjectId(zeroAddress);
+      }
+    }
+  }
+
   const add = async (values) => {
     /* Here goes the Web3 Contract Call !!! */
     setLoading(true);
@@ -59,7 +71,6 @@ const NewDocPhDrawer = (props) => {
     
     setLoading(false);
     
-    // props.openNotificationWithIcon(`Here we should call the contract to add a ${props.objectName}`);
     onClose();
 
     props.openNotificationWithIcon(`${props.objectName} Added: {
@@ -84,23 +95,6 @@ const NewDocPhDrawer = (props) => {
         });
   }
 
-  const getSubjectInfo = () => {
-    let subjectId = form.getFieldValue("accountAddress");
-    // console.log(subjectId)
-    if (ethers.utils.isAddress(subjectId)) {
-      setLastAccountQueried(subjectId);
-      setSearchableSubjectId(subjectId);
-    } else {
-      const zeroAddress = "0x0000000000000000000000000000000000000000";
-      if (lastAccountQueried !== zeroAddress) {
-        setLastAccountQueried(zeroAddress);
-        setSearchableSubjectId(zeroAddress);
-      }
-      // props.openNotificationWithIcon('Check Account Address','Address supplied is not a valid Ethereum Account','warning');
-    }
-  }
-
-  // render() {
     return (
       <>
         <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
@@ -114,39 +108,39 @@ const NewDocPhDrawer = (props) => {
           visible={visible}
           bodyStyle={{ paddingBottom: 80 }}
           extra={
-            <Space>
-              <Button onClick={onClose}>Cancel</Button>
-              <Button onClick={handleFormSubmit} type="primary">
-                Add
-              </Button>
-            </Space>
+            <Spin spinning={loading}>
+              <Space>
+                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={handleFormSubmit} type="primary">
+                  Add
+                </Button>
+              </Space>
+            </Spin>
           }
         >
           <Form layout="vertical" form={form} onFinish={onFinish} hideRequiredMark>
             <Form.Item
                 name="accountAddress"
                 label="Account Address"
-                // rules={[{ required: true, message: "Please enter Valid Account", }]}
                 rules={[{ validator: checkAccount, }]}
             >
-              <Input placeholder="0x..."/>
+              <Input placeholder="0x..." disabled={loading} />
             </Form.Item>
             <Form.Item
                 name="degree"
                 label="Degree"
                 rules={[{ required: true, message: 'Please enter Degree' }]}
             >
-              <Input placeholder="Major Degree" disabled={!validAccount || !existsSubject} />
+              <Input placeholder="Major Degree" disabled={!validAccount || !existsSubject || loading} />
             </Form.Item>
             <Form.Item
                 name="license"
                 label="License"
                 rules={[{ required: true, message: 'Please enter License' }]}
             >
-                <Input placeholder="Please enter License" disabled={(!validAccount || !existsSubject)} />
+                <Input placeholder="Please enter License" disabled={!validAccount || !existsSubject || loading} />
             </Form.Item>
           </Form>
-          {/* <Button onClick={getSubjectInfo}>Check If Subject Exists</Button> */}
           {
             ( <SubjectData 
               account={props.account}
@@ -157,7 +151,7 @@ const NewDocPhDrawer = (props) => {
               mainTitle="Subject Search"
             /> )
           }
-          { props.contract && // userDoctorData && userDoctorData.license && //userSubjectData.name &&
+          { props.contract &&
             ( <DocPhData
                 account={props.account}
                 contract={props.contract}
@@ -167,9 +161,8 @@ const NewDocPhDrawer = (props) => {
                 asyncContractCallback={props.contract.getDoctor}
                 objectName="Doctor"
             /> )
-            //(<p>Degree: {userDoctorData.degree}, License: {userDoctorData.license}</p>) }
         }
-        { props.contract && // userPharmacistData && userPharmacistData.license && //userSubjectData.name &&
+        { props.contract &&
             ( <DocPhData
                 account={props.account}
                 contract={props.contract}
@@ -179,13 +172,11 @@ const NewDocPhDrawer = (props) => {
                 asyncContractCallback={props.contract.getPharmacist}
                 objectName="Pharmacist"
             /> )
-            //(<p>Degree: {userPharmacistData.degree}, License: {userPharmacistData.license}</p>) }
         }
 
         </Drawer>
       </>
     );
-  // }
 }
 
 export default NewDocPhDrawer;

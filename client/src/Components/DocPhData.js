@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Row, Typography } from 'antd';
+import { Col, Row, Spin, Typography } from 'antd';
 
 const DocPhData = (props) => {
 
     const [docPhData, setDocPhData] = useState({ subjectId: 0, degree: '', license: ''});
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (props.contract && props.account && props.subjectId) {
@@ -16,9 +17,10 @@ const DocPhData = (props) => {
         let result = null;
         
         const {subjectId} = props
+        setLoading(true);
         try {
             result = await props.asyncContractCallback(subjectId);
-        } catch (error) { console.log(error); }
+        } catch (error) { console.log(error); setLoading(false); }
 
         if (result) {
             setDocPhData({
@@ -31,16 +33,16 @@ const DocPhData = (props) => {
             } else {
                 props.setExistsDocPh(false);
             }
-            // console.log(`Subject Data: ${result}`);
         } else {
             setDocPhData(null);
             props.setExistsDocPh(false);
             console.log(`${props.objectName} is not a registered subject`);
         }
+        setLoading(false);
     }
 
     return (
-        <>
+        <Spin spinning={loading}>
         { props.contract && !props.existsDocPh &&
             (
             <Row style={{ paddingTop: 20 }}>
@@ -58,7 +60,7 @@ const DocPhData = (props) => {
             </Row>
             )
         }
-        </>   
+        </Spin>   
     )
 }
 

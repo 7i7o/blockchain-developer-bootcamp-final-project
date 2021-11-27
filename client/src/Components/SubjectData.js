@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Row, Typography } from 'antd';
+import { Col, Row, Spin, Typography } from 'antd';
 
 const SubjectData = (props) => {
 
     const [subjectData, setSubjectData] = useState({ subjectId: 0, name: '', birthDate: new Date(0), homeAddress: ''});
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (props.contract && props.account && props.subjectId) {
@@ -16,9 +17,10 @@ const SubjectData = (props) => {
         let result = null;
         
         const {contract, subjectId} = props
+        setLoading(true);
         try {
             result = await contract.getSubject(subjectId);
-        } catch (error) { console.log(error); }
+        } catch (error) { console.log(error); setLoading(false); }
         
         if (result) {
             setSubjectData({
@@ -32,16 +34,16 @@ const SubjectData = (props) => {
             } else {
                 props.setExistsSubject(false);
             }
-            // console.log(`Subject Data: ${result}`);
         } else {
             setSubjectData(null);
             props.setExistsSubject(false);
             console.log("User is not a registered subject");
         }
+        setLoading(false);
     }
 
     return (
-        <>
+        <Spin spinning={loading}>
         { props.contract && props.mainTitle &&
             (
             <Row style={{ paddingTop: 40 }}>
@@ -71,7 +73,7 @@ const SubjectData = (props) => {
             </Row>
             )
         }
-        </>
+        </Spin>
     )
 }
 

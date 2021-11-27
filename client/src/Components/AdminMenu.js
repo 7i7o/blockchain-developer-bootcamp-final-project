@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Col, Row, Typography } from 'antd';
 import NewSubjectDrawer from './NewSubjectDrawer';
 import NewDocPhDrawer from './NewDocPhDrawer';
-// import NewPharmacistDrawer from './NewPharmacistDrawer';
 
 const AdminMenu = (props) => {
 
@@ -19,7 +18,6 @@ const AdminMenu = (props) => {
         const checkIsAdmin = async () => {
             try {
                 let result = await props.contract.isAdmin(props.account);
-                // console.log(`Is Admin: ${result}`);
                 setIsAdmin(result);
             } catch (error) {
                 props.openNotificationWithIcon('Admin Check Failed','Admin role check failed. Check the console for more info.', 'error');
@@ -58,11 +56,6 @@ const AdminMenu = (props) => {
                         asyncContractCallback={props.contract.setPharmacistData}
                         objectName="Pharmacist"
                     />
-                    {/* <NewPharmacistDrawer
-                        account={props.account}
-                        contract={props.contract}
-                        openNotificationWithIcon={props.openNotificationWithIcon}
-                    /> */}
                 </Col>
             </Row>
             )

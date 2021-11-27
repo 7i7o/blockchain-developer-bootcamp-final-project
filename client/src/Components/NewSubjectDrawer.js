@@ -1,15 +1,23 @@
 import React, { useState } from 'react';
-import { Drawer, Form, Button, Input, DatePicker, Space } from 'antd';
+import { Drawer, Form, Button, Input, DatePicker, Space, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import moment from 'moment';
+import SubjectData from './SubjectData';
+import DocPhData from './DocPhData';
 
-// class NewSubjectDrawer extends Component {
 export const NewSubjectDrawer = (props) => {
 
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const [validAccount, setValidAccount] = useState(false);
+    const [searchableSubjectId, setSearchableSubjectId] = useState("");
+    const [lastAccountQueried, setLastAccountQueried] = useState("");
+    const [existsSubject, setExistsSubject] = useState(false);
+    const [existsDoctor, setExistsDoctor] = useState(false);
+    const [existsPharmacist, setExistsPharmacist] = useState(false);
+    
     const [form] = Form.useForm();
 
     const showDrawer = () => {
@@ -20,16 +28,32 @@ export const NewSubjectDrawer = (props) => {
         setVisible(false);
     };
 
-    const checkNewAccount = (_, value) => {
+    const checkAccount = (_, value) => {
         if (ethers.utils.isAddress(value)) {
+            setValidAccount(true);
+            getSubjectInfo();
             return Promise.resolve();
         }
+        setValidAccount(false);
+        getSubjectInfo();
         return Promise.reject(new Error('Account must be a valid Ethereum Address!'));
     }
-
+ 
+    const getSubjectInfo = () => {
+        let subjectId = form.getFieldValue("accountAddress");
+        if (ethers.utils.isAddress(subjectId)) {
+          setLastAccountQueried(subjectId);
+          setSearchableSubjectId(subjectId);
+        } else {
+          const zeroAddress = "0x0000000000000000000000000000000000000000";
+          if (lastAccountQueried !== zeroAddress) {
+            setLastAccountQueried(zeroAddress);
+            setSearchableSubjectId(zeroAddress);
+          }
+        }
+      }
+    
     function disabledDate(current) {
-        // Can not select days after today and today
-        // TODO: Fix disabled dates for they are not working
         return current && current > moment().startOf('day');
     }
 
@@ -37,7 +61,6 @@ export const NewSubjectDrawer = (props) => {
         /* Here goes the Web3 Contract Call !!! */
         setLoading(true);
 
-        // console.log("Contract: ", props.contract)
         let birthDateInSeconds = Math.ceil(values.birthDate.valueOf() / 1000);
         const txn = await props.contract.setSubjectData(
             values.accountAddress,
@@ -49,13 +72,12 @@ export const NewSubjectDrawer = (props) => {
 
         await txn.wait();
 
-        props.openNotificationWithIcon(`Contract called finished succesfully.`);
+        props.openNotificationWithIcon(`Transaction finished succesfully.`);
         
         setLoading(false);
         
         let birthDate = new Date(birthDateInSeconds * 1000)
 
-        
         onClose();
 
         props.openNotificationWithIcon(`Subject Added: {
@@ -81,7 +103,6 @@ export const NewSubjectDrawer = (props) => {
             });
     }
 
-//   render() {
     return (
       <>
         <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
@@ -89,57 +110,92 @@ export const NewSubjectDrawer = (props) => {
         </Button>
         <Drawer
           title="Add a new subject"
-        //   width={720}
           width={600}
           onClose={onClose}
           visible={visible}
           bodyStyle={{ paddingBottom: 80 }}
           extra={
-            <Space>
-              <Button onClick={onClose}>Cancel</Button>
-              <Button onClick={handleFormSubmit} type="primary" disabled={loading} >
-                Add
-              </Button>
-            </Space>
+            <Spin spinning={loading}>
+                <Space>
+                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={handleFormSubmit} type="primary" disabled={loading} >
+                    Add
+                </Button>
+                </Space>
+            </Spin>
           }
         >
           <Form layout="vertical" form={form} onFinish={onFinish} hideRequiredMark>
             <Form.Item
                 name="accountAddress"
                 label="Account Address"
-                // rules={[{ required: true, message: "Please enter Subject's Account", }]}
-                rules={[{ validator: checkNewAccount, }]}
+                rules={[{ validator: checkAccount, }]}
             >
-              <Input placeholder="0x..." />
+              <Input placeholder="0x..." disabled={loading} />
             </Form.Item>
             <Form.Item
                 name="fullName"
                 label="Full Name"
                 rules={[{ required: true, message: 'Please enter Full Name' }]}
             >
-                <Input placeholder="Please enter full name" />
+                <Input placeholder="Please enter full name" disabled={!validAccount || loading} />
             </Form.Item>
             <Form.Item
                 name="birthDate"
                 label="Date of Birth"
                 disabledDate={disabledDate}
                 rules={[{ required: true, message: 'Please enter Date of Birth' }]}
-                // rules={[{ validator: checkNewBirthDate }]}
             >
-              <DatePicker />
+              <DatePicker
+                disabled={!validAccount || loading}
+                disabledDate={disabledDate}
+              />
             </Form.Item>
             <Form.Item
                 name="homeAddress"
                 label="Home Address"
             >
-              <Input placeholder="123 Home St."/>
+              <Input placeholder="123 Home St., Local City" disabled={!validAccount || loading} />
             </Form.Item>
           </Form>
+
+          {
+            ( <SubjectData 
+              account={props.account}
+              contract={props.contract}
+              openNotificationWithIcon={props.openNotificationWithIcon}
+              subjectId={searchableSubjectId}
+              existsSubject={existsSubject} setExistsSubject={setExistsSubject}
+              mainTitle="Subject Search"
+            /> )
+          }
+          { props.contract &&
+            ( <DocPhData
+                account={props.account}
+                contract={props.contract}
+                openNotificationWithIcon={props.openNotificationWithIcon}
+                subjectId={searchableSubjectId}
+                existsDocPh={existsDoctor} setExistsDocPh={setExistsDoctor}
+                asyncContractCallback={props.contract.getDoctor}
+                objectName="Doctor"
+            /> )
+        }
+        { props.contract &&
+            ( <DocPhData
+                account={props.account}
+                contract={props.contract}
+                openNotificationWithIcon={props.openNotificationWithIcon}
+                subjectId={searchableSubjectId}
+                existsDocPh={existsPharmacist} setExistsDocPh={setExistsPharmacist}
+                asyncContractCallback={props.contract.getPharmacist}
+                objectName="Pharmacist"
+            /> )
+        }
+
+
         </Drawer>
       </>
     );
-//   }
 }
 
 export default NewSubjectDrawer;
-// ReactDOM.render(<NewSubjectDrawer />, mountNode);
