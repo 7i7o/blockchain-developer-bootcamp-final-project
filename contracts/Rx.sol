@@ -104,6 +104,49 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
         _;
     }
 
+    /// @notice Event to signal when a new Rx has been minted
+    /// @param sender address of the Doctor that minted the Rx
+    /// @param receiver address of the Subject that received the Rx minted
+    /// @param tokenId Id of the Token (Rx) that has been minted
+    event minted(address indexed sender, address indexed receiver, uint256 indexed tokenId);
+
+    /// @notice Event to signal when adding/replacing a Subject allowed to receive/hold NFT Prescriptions
+    /// @param sender is the address of the admin that set the Subject's data
+    /// @param _subjectId is the registered address of the subject (approved for holding NFT Prescriptions)
+    /// @param _birthDate is the subjects' date of birth, in seconds, from UNIX Epoch (1970-01-01)
+    /// @param _name is the subject's full name
+    /// @param _homeAddress is the subject's legal home address
+    event subjectDataSet(address indexed sender, address indexed _subjectId, uint256 _birthDate, string _name, string _homeAddress);
+
+    /// @notice Event to signal when adding/replacing a Doctor allowed to mint NFT Prescriptions
+    /// @param sender is the address of the admin that set the Doctor's data
+    /// @param _subjectId is the ethereum address for the doctor (same Id as the subject that holds this doctor's personal details)
+    /// @param _degree contains a string with the degree of the doctor
+    /// @param _license contains a string with the legal license of the doctor
+    event doctorDataSet(address indexed sender, address indexed _subjectId, string _degree, string _license);
+    
+    /// @notice Event to signal when adding/replacing a Pharmacist allowed to burn NFT Prescriptions
+    /// @param sender is the address of the admin that set the Pharmacist's data
+    /// @param _subjectId is the ethereum address for the pahrmacist (same Id as the subject that holds this pharmacist's personal details)
+    /// @param _degree contains a string with the degree of the pharmacist
+    /// @param _license contains a string with the legal license of the pharmacist
+    event pharmacistDataSet(address indexed sender, address indexed _subjectId, string _degree, string _license);
+
+    /// @notice Event to signal a removed Subject
+    /// @param sender is the address of the admin that removed the Subject
+    /// @param _subjectId is the registered address of the subject removed
+    event subjectRemoved(address indexed sender, address indexed _subjectId);
+
+    /// @notice Event to signal a removed Doctor
+    /// @param sender is the address of the admin that removed the Doctor
+    /// @param _subjectId is the registered address of the doctor removed
+    event doctorRemoved(address indexed sender, address indexed _subjectId);
+
+    /// @notice Event to signal a removed Pharmacist
+    /// @param sender is the address of the admin that removed the Pharmacist
+    /// @param _subjectId is the registered address of the pharmacist removed
+    event pharmacistRemoved(address indexed sender, address indexed _subjectId);
+
     /** End of State Variables & Modifiers for final project */
 
     /// @notice constructor for NFT Prescriptions contract
@@ -128,7 +171,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
 
     /// @dev function override required by solidity
     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) onlyRole(BURNER_ROLE) {
-        delete rxs[tokenId];
+        // delete rxs[tokenId]; // Keep Rx Data to be able to view past Rxs
         super._burn(tokenId);
         //TODO: Change prescription life cycle in 'Status' to keep prescription data without burning
     }
@@ -188,6 +231,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
                                 _keys,
                                 _values);
 
+            emit minted(msg.sender, to, tokenId);
             //TODO: Add life cycle Status to the prescription
             // rxs[tokenId] = RxData(Status.Draft, block.timestamp, getSubject(to), getSubject(msg.sender), getDoctor(msg.sender), _keys, _values);
     }
@@ -255,6 +299,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
             // Subject memory newSubject = Subject(_subjectId, _name, _birthDate, _homeAddress);
             // subjects[_subjectId] = newSubject;
             subjects[_subjectId] = RxStructs.Subject(_subjectId, _birthDate, _name, _homeAddress);
+            emit subjectDataSet(msg.sender, _subjectId, _birthDate, _name, _homeAddress);
             return subjects[_subjectId].subjectId;
     }
 
@@ -276,6 +321,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
             grantRole(MINTER_ROLE, _subjectId);
             // }
             doctors[_subjectId] = RxStructs.Doctor(_subjectId, _degree, _license);
+            emit doctorDataSet(msg.sender, _subjectId, _degree, _license);
             return doctors[_subjectId].subjectId;
     }
 
@@ -297,6 +343,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
             grantRole(BURNER_ROLE, _subjectId);
             // }
             pharmacists[_subjectId] = RxStructs.Pharmacist(_subjectId, _degree, _license);
+            emit pharmacistDataSet(msg.sender, _subjectId, _degree, _license);
             return pharmacists[_subjectId].subjectId;
     }
 
@@ -311,6 +358,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
         isNotPharmacist(_subjectId) {
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isSubject()
             delete subjects[_subjectId];
+            emit subjectRemoved(msg.sender, _subjectId);
     }
 
     /// @notice Function to remove a registered Doctor
@@ -323,6 +371,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isDoctor()
             revokeRole(MINTER_ROLE, _subjectId);
             delete doctors[_subjectId];
+            emit doctorRemoved(msg.sender, _subjectId);
     }
 
     /// @notice Function to remove a registered Pharmacist
@@ -335,6 +384,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isPharmacist()
             revokeRole(BURNER_ROLE, _subjectId);
             delete pharmacists[_subjectId];
+            emit pharmacistRemoved(msg.sender, _subjectId);
     }
 
 }
