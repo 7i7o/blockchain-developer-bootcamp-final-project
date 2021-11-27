@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Col, Row, Typography } from 'antd';
 import NewSubjectDrawer from './NewSubjectDrawer';
 import NewDocPhDrawer from './NewDocPhDrawer';
+import NewAdminDrawer from './NewAdminDrawer';
 
 const AdminMenu = (props) => {
 
@@ -55,6 +56,13 @@ const AdminMenu = (props) => {
                         openNotificationWithIcon={props.openNotificationWithIcon}
                         asyncContractCallback={props.contract.setPharmacistData}
                         objectName="Pharmacist"
+                    />
+                </Col>
+                <Col span={24} className="centerChilds" style={{padding:5}}>
+                    <NewAdminDrawer
+                        account={props.account}
+                        contract={props.contract}
+                        openNotificationWithIcon={props.openNotificationWithIcon}
                     />
                 </Col>
             </Row>
