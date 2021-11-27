@@ -26,7 +26,7 @@ library NFTSVG {
 
             // SVG Header
             parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="12px" ' 
-                            'preserveAspectRatio="xMinYMin meet" viewBox="0 0 600 800">'
+                            'preserveAspectRatio="xMinYMin meet" viewBox="0 0 600 800" style="background:white">'
                             '<g fill="none" stroke="#000" stroke-width="1px">'
                                 '<rect x="2" y="2" width="596" height="796"/>' // Frame
                                 '<path d="m15 135h570"/>' // Top line
