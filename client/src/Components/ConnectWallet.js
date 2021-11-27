@@ -87,7 +87,7 @@ const ConnectWallet = (props) => {
 
     return (<Row style={{ width: "100%", backgroundColor: "lightgrey", padding: 10 }}>
               <Col span={4} style={{ display: 'flex', justifyContent: 'left', alignItems: 'baseline', maxHeight: 30 }}>
-                <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 120 120">
+                <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 120 120" style={{minWidth:120,maxWidth:120}}>
                   <g opacity="0.6">
                     <circle fill="darkblue" cx="8" cy="8" r="7.5"/>
                     <path fill="red" d="m22.4 14.6h4l-15,24h-4z"/>
