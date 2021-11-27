@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Drawer, Form, Button, Input, DatePicker, Space, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import moment from 'moment';
 import SubjectData from './SubjectData';
 import DocPhData from './DocPhData';
+
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const NewSubjectDrawer = (props) => {
 
@@ -18,6 +20,11 @@ export const NewSubjectDrawer = (props) => {
     const [existsDoctor, setExistsDoctor] = useState(false);
     const [existsPharmacist, setExistsPharmacist] = useState(false);
     
+    const [resultSubjectId, setResultSubjectId] = useState("");
+    const [resultName, setResultName] = useState("");
+    const [resultBirthDate, setResultBirthDate] = useState(0);
+    const [resultHomeAddress, setResultHomeAddress] = useState("");
+
     const [form] = Form.useForm();
 
     const showDrawer = () => {
@@ -45,16 +52,33 @@ export const NewSubjectDrawer = (props) => {
           setLastAccountQueried(subjectId);
           setSearchableSubjectId(subjectId);
         } else {
-          const zeroAddress = "0x0000000000000000000000000000000000000000";
-          if (lastAccountQueried !== zeroAddress) {
-            setLastAccountQueried(zeroAddress);
-            setSearchableSubjectId(zeroAddress);
+          if (lastAccountQueried !== ZERO_ADDRESS) {
+            setLastAccountQueried(ZERO_ADDRESS);
+            setSearchableSubjectId(ZERO_ADDRESS);
           }
         }
       }
     
+    useEffect(() => {
+      if (resultSubjectId !== ZERO_ADDRESS) {
+        form.setFieldsValue({
+          accountAddress: resultSubjectId,
+          birthDate: moment(resultBirthDate),
+          fullName: resultName,
+          homeAddress: resultHomeAddress
+        })
+      } else {
+        form.setFieldsValue({
+          birthDate: moment(),
+          fullName: "",
+          homeAddress: ""
+        })
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [resultSubjectId, resultName, resultBirthDate, resultHomeAddress]);
+    
     function disabledDate(current) {
-        return current && current > moment().startOf('day');
+        return current && current > moment().endOf('day');
     }
 
     const addSubject = async (values) => {
@@ -106,10 +130,10 @@ export const NewSubjectDrawer = (props) => {
     return (
       <>
         <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
-          New Subject
+          Add Subject
         </Button>
         <Drawer
-          title="Add a new subject"
+          title="Add or Modify Subject"
           width={600}
           onClose={onClose}
           visible={visible}
@@ -119,7 +143,7 @@ export const NewSubjectDrawer = (props) => {
                 <Space>
                 <Button onClick={onClose}>Cancel</Button>
                 <Button onClick={handleFormSubmit} type="primary" disabled={loading} >
-                    Add
+                    Save
                 </Button>
                 </Space>
             </Spin>
@@ -167,6 +191,11 @@ export const NewSubjectDrawer = (props) => {
               subjectId={searchableSubjectId}
               existsSubject={existsSubject} setExistsSubject={setExistsSubject}
               mainTitle="Subject Search"
+              stateFull={true}
+              resultSubjectId={resultSubjectId} setResultSubjectId={setResultSubjectId}
+              resultName={resultName} setResultName={setResultName}
+              resultBirthDate={resultBirthDate} setResultBirthDate={setResultBirthDate}
+              resultHomeAddress={resultHomeAddress} setResultHomeAddress={setResultHomeAddress}
             /> )
           }
           { props.contract &&
@@ -178,7 +207,7 @@ export const NewSubjectDrawer = (props) => {
                 existsDocPh={existsDoctor} setExistsDocPh={setExistsDoctor}
                 asyncContractCallback={props.contract.getDoctor}
                 objectName="Doctor"
-            /> )
+              /> )
         }
         { props.contract &&
             ( <DocPhData

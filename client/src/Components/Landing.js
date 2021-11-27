@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import SubjectData from './SubjectData'
 import DocPhData from './DocPhData'
 import AdminMenu from './AdminMenu';
+import MainMenu from './MainMenu';
 
 const Landing = (props) => {
 
@@ -11,6 +12,30 @@ const Landing = (props) => {
     const [existsPharmacist, setExistsPharmacist] = useState(false);
     
     return (<>
+        { props.contract && existsSubject && 
+            (<MainMenu
+                account={props.account}
+                contract={props.contract}
+                openNotificationWithIcon={props.openNotificationWithIcon}
+                objectName="Subject"
+            />)
+        }
+        { props.contract && existsDoctor && 
+            (<MainMenu
+                account={props.account}
+                contract={props.contract}
+                openNotificationWithIcon={props.openNotificationWithIcon}
+                objectName="Doctor"
+            />)
+        }
+        { props.contract && existsPharmacist && 
+            (<MainMenu
+                account={props.account}
+                contract={props.contract}
+                openNotificationWithIcon={props.openNotificationWithIcon}
+                objectName="Pharmacist"
+            />)
+        }
         { props.contract &&
             (<AdminMenu 
                 account={props.account}

@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Drawer, Form, Button, Input, Space, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import SubjectData from './SubjectData';
 import DocPhData from './DocPhData';
+
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const NewDocPhDrawer = (props) => {
 
@@ -16,6 +18,10 @@ const NewDocPhDrawer = (props) => {
   const [existsSubject, setExistsSubject] = useState(false);
   const [existsDoctor, setExistsDoctor] = useState(false);
   const [existsPharmacist, setExistsPharmacist] = useState(false);
+
+  const [resultSubjectId, setResultSubjectId] = useState("");
+  const [resultDegree, setResultDegree] = useState("");
+  const [resultLicense, setResultLicense] = useState("");
 
   const [form] = Form.useForm();
 
@@ -44,13 +50,28 @@ const NewDocPhDrawer = (props) => {
       setLastAccountQueried(subjectId);
       setSearchableSubjectId(subjectId);
     } else {
-      const zeroAddress = "0x0000000000000000000000000000000000000000";
-      if (lastAccountQueried !== zeroAddress) {
-        setLastAccountQueried(zeroAddress);
-        setSearchableSubjectId(zeroAddress);
+      if (lastAccountQueried !== ZERO_ADDRESS) {
+        setLastAccountQueried(ZERO_ADDRESS);
+        setSearchableSubjectId(ZERO_ADDRESS);
       }
     }
   }
+
+  useEffect(() => {
+    if (resultSubjectId !== ZERO_ADDRESS) {
+      form.setFieldsValue({
+        accountAddress: resultSubjectId,
+        degree: resultDegree,
+        license: resultLicense
+      })
+    } else {
+      form.setFieldsValue({
+        degree: "",
+        license: ""
+      })
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resultSubjectId, resultDegree, resultLicense]);
 
   const add = async (values) => {
     /* Here goes the Web3 Contract Call !!! */
@@ -101,7 +122,7 @@ const NewDocPhDrawer = (props) => {
           Add {props.objectName}
         </Button>
         <Drawer
-          title={`Add a new ${props.objectName}`}
+          title={`Add or Modify ${props.objectName}`}
         //   width={720}
           width={600}
           onClose={onClose}
@@ -112,7 +133,7 @@ const NewDocPhDrawer = (props) => {
               <Space>
                 <Button onClick={onClose}>Cancel</Button>
                 <Button onClick={handleFormSubmit} type="primary">
-                  Add
+                  Save
                 </Button>
               </Space>
             </Spin>
@@ -160,7 +181,11 @@ const NewDocPhDrawer = (props) => {
                 existsDocPh={existsDoctor} setExistsDocPh={setExistsDoctor}
                 asyncContractCallback={props.contract.getDoctor}
                 objectName="Doctor"
-            /> )
+                stateFull={props.objectName === "Doctor"}
+                resultSubjectId={resultSubjectId} setResultSubjectId={setResultSubjectId}
+                resultDegree={resultDegree} setResultDegree={setResultDegree}
+                resultLicense={resultLicense} setResultLicense={setResultLicense}
+              /> )
         }
         { props.contract &&
             ( <DocPhData
@@ -171,6 +196,10 @@ const NewDocPhDrawer = (props) => {
                 existsDocPh={existsPharmacist} setExistsDocPh={setExistsPharmacist}
                 asyncContractCallback={props.contract.getPharmacist}
                 objectName="Pharmacist"
+                stateFull={props.objectName === "Pharmacist"}
+                resultSubjectId={resultSubjectId} setResultSubjectId={setResultSubjectId}
+                resultDegree={resultDegree} setResultDegree={setResultDegree}
+                resultLicense={resultLicense} setResultLicense={setResultLicense}
             /> )
         }
 

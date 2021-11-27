@@ -28,6 +28,11 @@ const DocPhData = (props) => {
                             degree: result[1],
                             license: result[2]
             });
+            if (props.stateFull) {
+                props.setResultSubjectId(result[0]);
+                props.setResultDegree(result[1]);
+                props.setResultLicense(result[2]);
+            }
             if (result[1] && result[1].length) {
                 props.setExistsDocPh(true);
             } else {

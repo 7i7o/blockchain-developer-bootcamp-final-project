@@ -23,12 +23,19 @@ const SubjectData = (props) => {
         } catch (error) { console.log(error); setLoading(false); }
         
         if (result) {
+            let birthDate = new Date(result[1].toNumber() * 1000);// + 0*3*60*60*1000);
             setSubjectData({
                             subjectId: result[0],
                             name: result[2],
-                            birthDate: new Date(result[1].toNumber() * 1000 + 0*3*60*60*1000),
+                            birthDate: birthDate,
                             homeAddress: result[3]
             });
+            if (props.stateFull) {
+                props.setResultSubjectId(result[0]);
+                props.setResultName(result[2]);
+                props.setResultBirthDate(birthDate);
+                props.setResultHomeAddress(result[3]);
+            }
             if (result[2] && result[2].length) {
                 props.setExistsSubject(true);
             } else {
