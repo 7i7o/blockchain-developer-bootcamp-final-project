@@ -1,3 +1,5 @@
+require('dotenv').config();
+const HDWalletProvider = require("@truffle/hdwallet-provider");
 const path = require("path");
 
 module.exports = {
@@ -14,7 +16,17 @@ module.exports = {
       host: "localhost",
       port: 8545,
       network_id: "*",
-    }
+    },
+    rinkeby:{
+      provider: function() {
+        return new HDWalletProvider(
+          process.env['MNEMONIC'],
+          process.env['INFURA_PROJECT_ID'],
+          1 // Sign / Migrate from second account (it is zero-based)
+        );
+      },
+      network_id: 4, // Rinkeby Network Id
+    },
   },
   // Configure your compilers
   compilers: {
@@ -25,7 +37,7 @@ module.exports = {
           // enabled: false,
           //  runs: 200
           enabled: true,
-          runs: 2,
+          runs: 200,
          },
       }
     }

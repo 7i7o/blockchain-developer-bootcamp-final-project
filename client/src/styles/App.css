@@ -1,9 +1,24 @@
 @import '~antd/dist/antd.css';
+/* @import '~antd/dist/antd.dark.less'; */
 
-/* .App {
-  text-align: center;
+.App {
+  width: 100%;
 }
 
+.fullWidth {
+  width: 100%;
+}
+
+.centerChilds {
+  display: flex;
+  justify-content: center;
+}
+
+.pad5 {
+  padding: 5;
+}
+
+/*
 .App-logo {
   height: 40vmin;
 }

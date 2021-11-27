@@ -21,7 +21,7 @@ class NewPharmacistDrawer extends Component {
 
   addSubject = () => {
     /* Here goes the Web3 Contract Call !!! */
-    this.props.parentProps.showMessage("Here we should call the contract to add a pharmacist");
+    this.props.parentProps.openNotificationWithIcon("Here we should call the contract to add a pharmacist");
     this.onClose();
   }
 
@@ -34,7 +34,7 @@ class NewPharmacistDrawer extends Component {
         <Drawer
           title="Add a new pharmacist"
         //   width={720}
-          width={450}
+          width={600}
           onClose={this.onClose}
           visible={this.state.visible}
           bodyStyle={{ paddingBottom: 80 }}
