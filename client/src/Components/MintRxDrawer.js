@@ -122,6 +122,7 @@ export const MintRxDrawer = (props) => {
           onClose={onClose}
           visible={visible}
           bodyStyle={{ paddingBottom: 80 }}
+          getContainer={false} // Remove Warning about Form.useForm() not connected to Form element
           extra={
             <Spin spinning={loading}>
                 <Space>

@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Col, Row, Typography } from 'antd';
 import NewSubjectDrawer from './NewSubjectDrawer';
 import NewDocPhDrawer from './NewDocPhDrawer';
-import NewAdminDrawer from './NewAdminDrawer';
+import AccountActionDrawer from './AccountActionDrawer';
+
+const BUTTON_SIZE = "200px"; // All buttons, same width
+// const BUTTON_SIZE = "2"; // All buttons, different widths
 
 const AdminMenu = (props) => {
 
@@ -18,7 +21,7 @@ const AdminMenu = (props) => {
 
         const checkIsAdmin = async () => {
             try {
-                let result = await props.contract.isAdmin(props.account);
+                const result = await props.contract.isAdmin(props.account);
                 setIsAdmin(result);
             } catch (error) {
                 props.openNotificationWithIcon('Admin Check Failed','Admin role check failed. Check the console for more info.', 'error');
@@ -38,31 +41,82 @@ const AdminMenu = (props) => {
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
+                        buttonSize={BUTTON_SIZE}
                     />
                 </Col>
                 <Col span={24} className="centerChilds" style={{padding:5}}>
+                    <AccountActionDrawer
+                        account={props.account}
+                        contract={props.contract}
+                        openNotificationWithIcon={props.openNotificationWithIcon}
+                        buttonSize={BUTTON_SIZE}
+                        accountAction="Remove"
+                        objectName="Patient"
+                        asyncContractCallback={props.contract.removeSubject}
+                    />
+                </Col>
+                <Col span={24} className="centerChilds" style={{padding:5, marginTop:20}}>
                     <NewDocPhDrawer
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
+                        buttonSize={BUTTON_SIZE}
                         asyncContractCallback={props.contract.setDoctorData}
                         objectName="Doctor"
                     />
                 </Col>
                 <Col span={24} className="centerChilds" style={{padding:5}}>
+                    <AccountActionDrawer
+                        account={props.account}
+                        contract={props.contract}
+                        openNotificationWithIcon={props.openNotificationWithIcon}
+                        buttonSize={BUTTON_SIZE}
+                        accountAction="Remove"
+                        objectName="Doctor"
+                        asyncContractCallback={props.contract.removeDoctor}
+                    />
+                </Col>
+                <Col span={24} className="centerChilds" style={{padding:5, marginTop:20}}>
                     <NewDocPhDrawer
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
+                        buttonSize={BUTTON_SIZE}
                         asyncContractCallback={props.contract.setPharmacistData}
                         objectName="Pharmacist"
                     />
                 </Col>
                 <Col span={24} className="centerChilds" style={{padding:5}}>
-                    <NewAdminDrawer
+                    <AccountActionDrawer
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
+                        buttonSize={BUTTON_SIZE}
+                        accountAction="Remove"
+                        objectName="Pharmacist"
+                        asyncContractCallback={props.contract.removePharmacist}
+                    />
+                </Col>
+                <Col span={24} className="centerChilds" style={{padding:5, marginTop:20}}>
+                    <AccountActionDrawer
+                        account={props.account}
+                        contract={props.contract}
+                        openNotificationWithIcon={props.openNotificationWithIcon}
+                        buttonSize={BUTTON_SIZE}
+                        accountAction="Add"
+                        objectName="Admin"
+                        asyncContractCallback={props.contract.addAdmin}
+                    />
+                </Col>
+                <Col span={24} className="centerChilds" style={{padding:5}}>
+                    <AccountActionDrawer
+                        account={props.account}
+                        contract={props.contract}
+                        openNotificationWithIcon={props.openNotificationWithIcon}
+                        buttonSize={BUTTON_SIZE}
+                        accountAction="Remove"
+                        objectName="Admin"
+                        asyncContractCallback={props.contract.removeAdmin}
                     />
                 </Col>
             </Row>

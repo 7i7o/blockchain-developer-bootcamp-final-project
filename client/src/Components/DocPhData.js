@@ -41,7 +41,7 @@ const DocPhData = (props) => {
         } else {
             setDocPhData(null);
             props.setExistsDocPh(false);
-            console.log(`${props.objectName} is not a registered subject`);
+            console.log(`${props.objectName} is not a registered patient`);
         }
         setLoading(false);
     }

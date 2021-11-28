@@ -14,13 +14,27 @@ import Rx from "../contracts/Rx.json";
 //   5: "Goerli Testnet",
 // }
 
-// const CONTRACT_ADDRESS = '0x668931aE15C2062BC5002306E1FeED42abdcEf8F' // on Rinkeby
+// const CONTRACT_ADDRESS = '0x668931aE15C2062BC5002306E1FeED42abdcEf8F' // v1 on Rinkeby
+// const CONTRACT_ADDRESS = '0x995c9446cEC8b39b16b10C8cbD4f99C7BD0c488C' // v2 on Rinkeby
+
 const NETWORK_ID = 4; // Rinkeby
 
 const ConnectWallet = (props) => {
 
-    const [loggedIn, setLoggedIn] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false)
 
+    if (window.ethereum) {
+      window.ethereum.on('chainChanged', (networks) => {
+        window.location.reload()
+      });
+      window.ethereum.on('accountsChanged', (accounts) => {
+        // console.log("Accounts changed:",accounts, props.connection);
+        if (props.connection) {
+          updateAccount();
+        } 
+      }); //window.location.reload());
+    }
+    
     async function getWeb3Modal() {
       // let Torus = (await import('@toruslabs/torus-embed')).default
       const web3Modal = new Web3Modal({
@@ -41,19 +55,43 @@ const ConnectWallet = (props) => {
     async function connect() {
       const web3Modal = await getWeb3Modal()
       const modalConnection = await web3Modal.connect()
-      const provider = new ethers.providers.Web3Provider(modalConnection)
-      const accounts = await provider.listAccounts()
       props.setConnection(modalConnection)
-      props.setAccount(accounts[0])
+      // setProvider(new ethers.providers.Web3Provider(modalConnection))
     }
+
+    const updateAccount = async () => {
+      if (props.connection){
+        const provider = new ethers.providers.Web3Provider(props.connection)
+        const accounts = await provider.listAccounts()
+        props.setAccount(accounts[0])
+      }
+    }
+
+    const updateChain = async () => {
+      const provider = new ethers.providers.Web3Provider(props.connection)
+      const networkInfo = await provider.getNetwork();
+      if (networkInfo && networkInfo.chainId) {
+        props.setRightNetwork(networkInfo.chainId === NETWORK_ID);
+      } else {
+        props.setRightNetwork(false);
+      }
+    }
+
+    useEffect( () => {
+      if (props.connection) {
+        updateAccount();
+        updateChain(); // Mostly for the first time a wallet is connected
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.connection])
 
     // This runs our function when the connection is updated (we have access to the network).
     useEffect(() => {
-      if (props.connection && props.account) {
+      if (props.connection && props.account && props.rightNetwork) {
         signIn()
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.connection, props.account])  
+    }, [props.connection, props.account, props.rightNetwork])  
     
     async function signIn() {
       if (!props.connection) {
@@ -71,21 +109,23 @@ const ConnectWallet = (props) => {
 
     // This runs our function when the contract is updated (we have a connection to Rx).
     useEffect(() => {
-      if (props.connection && props.account && props.contract) {
+      if (props.connection && props.account && props.contract && props.rightNetwork) {
         logIn()
       }
-    }, [props.connection, props.account, props.contract])  
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.connection, props.account, props.contract, props.rightNetwork])  
 
     async function logIn() {
-        setLoggedIn(true);
+        setLoggedIn(props.contract ? true : false );
     }  
 
     async function signOut() {
-      setLoggedIn(false);  
+      setLoggedIn(false);
       props.setContract(null);
     }
 
     return (<Row style={{ width: "100%", backgroundColor: "lightgrey", padding: 10 }}>
+            {
               <Col span={4} style={{ display: 'flex', justifyContent: 'left', alignItems: 'baseline', maxHeight: 30 }}>
                 <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 120 120" style={{minWidth:120,maxWidth:120}}>
                   <g opacity="0.6">
@@ -96,22 +136,34 @@ const ConnectWallet = (props) => {
                   </g>
                 </svg>
               </Col>
+            }
+            {
               <Col span={20} style={{ display: 'flex', justifyContent: 'right' }}>
-                { loggedIn && (
-                  <div style={{ float: 'right' }}>
-                    <Space direction="horizontal" align="center">
-                      <Typography.Text italic>Welcome, {props.account}</Typography.Text>
-                      <Button onClick={signOut} >Sign Out</Button>
-                    </Space>
-                  </div>
-                )}
-                { props.connection && !loggedIn && (
-                  <Button onClick={signIn} style={{float: 'right'}}>Sign In</Button>
+                <Space direction="horizontal" align="center">
+                  { !props.connection && (
+                    <Button onClick={connect} style={{float: 'right'}}>Connect Wallet</Button>
                   )}
-                {!props.connection && (
-                  <Button onClick={connect} style={{float: 'right'}}>Connect Wallet</Button>
-                )}
-            </Col>
+                  { props.connection && !props.rightNetwork && (
+                    <div style={{ float: 'right' }}>
+                        <Typography.Text strong>Rx only works on </Typography.Text>
+                        <Typography.Link href="https://faucet.rinkeby.io/" target="_blank">Rinkeby</Typography.Link>
+                        <Typography.Text strong>. Please change your network.</Typography.Text>
+                    </div>
+                  )}
+                  { props.connection && props.rightNetwork && !loggedIn && (
+                    <Button onClick={signIn} style={{float: 'right'}}>Sign In</Button>
+                  )}
+                  { props.connection && props.rightNetwork && loggedIn && (
+                    <div style={{ float: 'right' }}>
+                      <Space direction="horizontal" align="center">
+                        <Typography.Text italic>Welcome, {props.account}</Typography.Text>
+                        <Button onClick={signOut} >Sign Out</Button>
+                      </Space>
+                    </div>
+                  )}
+                </Space>
+              </Col>
+            }
           </Row>
     )
 }

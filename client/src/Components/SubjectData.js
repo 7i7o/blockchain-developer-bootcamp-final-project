@@ -44,7 +44,7 @@ const SubjectData = (props) => {
         } else {
             setSubjectData(null);
             props.setExistsSubject(false);
-            console.log("User is not a registered subject");
+            console.log("User is not a registered patient");
         }
         setLoading(false);
     }
@@ -65,14 +65,14 @@ const SubjectData = (props) => {
         { props.contract && !props.existsSubject &&
             (
             <Row style={{ paddingTop: 20 }}>
-                <Col span={24} style={{ textAlign: 'center'}}><Typography.Title level={5}>Subject Info Not Found</Typography.Title></Col>
+                <Col span={24} style={{ textAlign: 'center'}}><Typography.Title level={5}>Patient Info Not Found</Typography.Title></Col>
             </Row>
             )
         }
         { props.contract && props.existsSubject &&
             (
             <Row style={{ paddingTop: 20 }}>
-                <Col span={24} style={{ textAlign: 'center'}}><Typography.Title level={5}>Subject Info</Typography.Title></Col>
+                <Col span={24} style={{ textAlign: 'center'}}><Typography.Title level={5}>Patient Info</Typography.Title></Col>
                 <Col span={6} style={{ textAlign: 'right', paddingRight: 5 }}>Account Address:</Col><Col span={18}>{subjectData.subjectId}</Col>
                 <Col span={6} style={{ textAlign: 'right', paddingRight: 5 }}>Full Name:</Col><Col span={18}>{subjectData.name}</Col>
                 <Col span={6} style={{ textAlign: 'right', paddingRight: 5 }}>Date of Birth:</Col><Col span={18}>{subjectData.birthDate.toDateString()}</Col>

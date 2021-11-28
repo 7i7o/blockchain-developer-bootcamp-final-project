@@ -1,6 +1,7 @@
 import React from 'react';
 import { Col, Row, Typography } from 'antd';
 import MintRxDrawer from './MintRxDrawer';
+import ListRxDrawer from './ListRxDrawer';
 
 const MainMenu = (props) => {
 
@@ -19,12 +20,13 @@ const MainMenu = (props) => {
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
-                        objectName={props.objectName}
+                        accountAction='List'
+                        objectName='Rx'
                         />
                 </Col>
             </Row>)
         } */}
-        {props.contract && props.objectName === "Doctor" &&
+        {props.objectName === "Doctor" && props.contract && 
             (<Row className="centerChilds">
                 <Col span={24} className="centerChilds" style={{padding:5}}>
                     <MintRxDrawer

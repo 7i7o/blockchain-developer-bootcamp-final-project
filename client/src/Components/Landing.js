@@ -17,7 +17,7 @@ const Landing = (props) => {
                 account={props.account}
                 contract={props.contract}
                 openNotificationWithIcon={props.openNotificationWithIcon}
-                objectName="Subject"
+                objectName="Patient"
             />)
         }
         { props.contract && existsDoctor && 

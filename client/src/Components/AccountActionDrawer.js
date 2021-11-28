@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Drawer, Form, Button, Input, Space, Spin } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { MinusCircleTwoTone, PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import SubjectData from './SubjectData';
 import DocPhData from './DocPhData';
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-export const NewAdminDrawer = (props) => {
+export const AccountActionDrawer = (props) => {
 
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -35,14 +35,14 @@ export const NewAdminDrawer = (props) => {
     };
 
     const checkAccount = (_, value) => {
-        if (ethers.utils.isAddress(value)) {
-            setValidAccount(true);
-            getSubjectInfo();
-            return Promise.resolve();
-        }
-        setValidAccount(false);
-        getSubjectInfo();
-        return Promise.reject(new Error('Account must be a valid Ethereum Address!'));
+      if (ethers.utils.isAddress(value)) {
+          setValidAccount(true);
+          getSubjectInfo();
+          return Promise.resolve();
+      }
+      setValidAccount(false);
+      getSubjectInfo();
+      return Promise.reject(new Error('Account must be a valid Ethereum Address!'));
     }
  
     const getSubjectInfo = () => {
@@ -58,36 +58,14 @@ export const NewAdminDrawer = (props) => {
         }
       }
     
-    // useEffect(() => {
-    //   if (resultSubjectId !== ZERO_ADDRESS) {
-    //     form.setFieldsValue({
-    //       accountAddress: resultSubjectId,
-    //       birthDate: moment(resultBirthDate),
-    //       fullName: resultName,
-    //       homeAddress: resultHomeAddress
-    //     })
-    //   } else {
-    //     form.setFieldsValue({
-    //       birthDate: moment(),
-    //       fullName: "",
-    //       homeAddress: ""
-    //     })
-    //   };
-    //   // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [resultSubjectId, resultName, resultBirthDate, resultHomeAddress]);
-    
-    // function disabledDate(current) {
-    //     return current && current > moment().endOf('day');
-    // }
-
-    const addAdmin = async (values) => {
+    const accountAction = async (values) => {
         /* Here goes the Web3 Contract Call !!! */
         setLoading(true);
 
-        const txn = await props.contract.addAdmin(
+        const txn = await props.asyncContractCallback(
             values.accountAddress
         );
-        props.openNotificationWithIcon(`Starting 'Add Admin' transaction.`);
+        props.openNotificationWithIcon(`Starting '${props.accountAction} ${props.objectName}' transaction.`);
 
         await txn.wait();
 
@@ -97,18 +75,48 @@ export const NewAdminDrawer = (props) => {
         
         onClose();
 
-        props.openNotificationWithIcon(`Admin Added: Account: ${values.accountAddress}`);
+        props.openNotificationWithIcon(`Action '${props.accountAction} ${props.objectName}' performed on Account: ${values.accountAddress}`);
     }
 
     const onFinish = (values) => {
-        console.log('Received values from form: ', values);
+        // console.log('Received values from form: ', values);
     };
+
+    const checkAccountActionBeforeSubmit = () => {
+      if (props.accountAction === 'Remove') {
+        if (props.objectName === 'Pharmacist') {
+          if (!existsPharmacist) {
+            props.openNotificationWithIcon(`Cannot ${props.accountAction} ${props.objectName}`,`You can only ${props.accountAction} a registered ${props.objectName}!`, 'error');
+            return false;
+          }
+        } else if (props.objectName === 'Doctor') {
+          if (!existsDoctor) {
+            props.openNotificationWithIcon(`Cannot ${props.accountAction} ${props.objectName}`,`You can only ${props.accountAction} a registered ${props.objectName}!`, 'error');
+            return false;
+          }
+        } else if (props.objectName === 'Patient') {
+          if (existsPharmacist) {
+            props.openNotificationWithIcon(`Cannot ${props.accountAction} ${props.objectName}`,`Remove as Pharmacist first!`,'error');
+            return false;
+          } else if (existsDoctor) {
+            props.openNotificationWithIcon(`Cannot ${props.accountAction} ${props.objectName}`,`Remove as Doctor first!`,'error');
+            return false
+          } else if (!existsSubject) {
+            props.openNotificationWithIcon(`Cannot ${props.accountAction} ${props.objectName}`,`You can only ${props.accountAction} a registered ${props.objectName}!`,'error');
+            return false;
+          }
+        }
+      }
+      return true;
+    }
 
     const handleFormSubmit = () => {
         form.validateFields()
             .then((values) => {
-                console.log('Received values from form: ', values);
-                addAdmin(values);
+                // console.log('Received values from form: ', values);
+                if (checkAccountActionBeforeSubmit()) {
+                  accountAction(values);
+                }
             })
             .catch((errorInfo) => {
                 //console.log(errorInfo);
@@ -117,21 +125,34 @@ export const NewAdminDrawer = (props) => {
 
     return (
       <>
-        <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
-          Add Admin
+        <Button
+          type="primary"
+          onClick={showDrawer}
+          // icon={( (props.accountAction==='Remove') ? <MinusOutlined /> : <PlusOutlined /> )}
+          // icon={( (props.accountAction==='Remove') ? <MinusCircleOutlined /> : <PlusCircleOutlined /> )}
+          icon={(
+            (props.accountAction==='Remove') ?
+              <MinusCircleTwoTone /> : //twoToneColor="#c41a52" /> :
+              ((props.accountAction==='Add') ?
+                <PlusCircleTwoTone /> : //twoToneColor="#52c41a" /> :
+                ''))}
+          style={{minWidth: props.buttonSize}}
+        >
+          {`${props.accountAction} ${props.objectName}`}
         </Button>
         <Drawer
-          title="Add Admin"
+          title={`${props.accountAction} ${props.objectName}`}
           width={600}
           onClose={onClose}
           visible={visible}
           bodyStyle={{ paddingBottom: 80 }}
+          getContainer={false} // Remove Warning about Form.useForm() not connected to Form element
           extra={
             <Spin spinning={loading}>
                 <Space>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleFormSubmit} type="primary" disabled={loading} >
-                    Save
+                <Button onClick={handleFormSubmit} type="primary" disabled={!validAccount || loading} >
+                  {props.accountAction}
                 </Button>
                 </Space>
             </Spin>
@@ -154,7 +175,7 @@ export const NewAdminDrawer = (props) => {
               openNotificationWithIcon={props.openNotificationWithIcon}
               subjectId={searchableSubjectId}
               existsSubject={existsSubject} setExistsSubject={setExistsSubject}
-              mainTitle="Subject Search"
+              mainTitle="Search Results"
               stateFull={false}
             /> )
           }
@@ -167,9 +188,9 @@ export const NewAdminDrawer = (props) => {
                 existsDocPh={existsDoctor} setExistsDocPh={setExistsDoctor}
                 asyncContractCallback={props.contract.getDoctor}
                 objectName="Doctor"
-              /> )
-        }
-        { props.contract &&
+            /> )
+          }
+          { props.contract &&
             ( <DocPhData
                 account={props.account}
                 contract={props.contract}
@@ -179,10 +200,10 @@ export const NewAdminDrawer = (props) => {
                 asyncContractCallback={props.contract.getPharmacist}
                 objectName="Pharmacist"
             /> )
-        }
+          }
         </Drawer>
       </>
     );
 }
 
-export default NewAdminDrawer;
+export default AccountActionDrawer;

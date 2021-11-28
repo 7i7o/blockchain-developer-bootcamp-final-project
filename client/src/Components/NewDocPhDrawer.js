@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Drawer, Form, Button, Input, Space, Spin } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import SubjectData from './SubjectData';
 import DocPhData from './DocPhData';
@@ -118,7 +118,13 @@ const NewDocPhDrawer = (props) => {
 
     return (
       <>
-        <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
+        <Button
+          type="primary"
+          onClick={showDrawer}
+          // icon={<PlusOutlined />}
+          icon={<PlusCircleTwoTone />}//twoToneColor="#52c41a" />}
+          style={{minWidth: props.buttonSize}}
+        >
           Add {props.objectName}
         </Button>
         <Drawer
@@ -128,6 +134,7 @@ const NewDocPhDrawer = (props) => {
           onClose={onClose}
           visible={visible}
           bodyStyle={{ paddingBottom: 80 }}
+          getContainer={false} // Remove Warning about Form.useForm() not connected to Form element
           extra={
             <Spin spinning={loading}>
               <Space>
@@ -169,7 +176,7 @@ const NewDocPhDrawer = (props) => {
               openNotificationWithIcon={props.openNotificationWithIcon}
               subjectId={searchableSubjectId}
               existsSubject={existsSubject} setExistsSubject={setExistsSubject}
-              mainTitle="Subject Search"
+              mainTitle="Search Results"
             /> )
           }
           { props.contract &&

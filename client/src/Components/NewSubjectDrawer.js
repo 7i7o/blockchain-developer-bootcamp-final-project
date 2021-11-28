@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Drawer, Form, Button, Input, DatePicker, Space, Spin } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import moment from 'moment';
 import SubjectData from './SubjectData';
@@ -92,7 +92,7 @@ export const NewSubjectDrawer = (props) => {
             values.fullName,
             values.homeAddress
         );
-        props.openNotificationWithIcon(`Starting 'Add Subject' transaction.`);
+        props.openNotificationWithIcon(`Starting 'Add Patient' transaction.`);
 
         await txn.wait();
 
@@ -104,7 +104,7 @@ export const NewSubjectDrawer = (props) => {
 
         onClose();
 
-        props.openNotificationWithIcon(`Subject Added: {
+        props.openNotificationWithIcon(`Patient Added: {
             Account: ${values.accountAddress},
             Name: ${values.fullName},
             Date of Birth: ${birthDate},
@@ -129,15 +129,22 @@ export const NewSubjectDrawer = (props) => {
 
     return (
       <>
-        <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
-          Add Subject
+        <Button
+          type="primary"
+          onClick={showDrawer}
+          // icon={<PlusOutlined />}
+          icon={<PlusCircleTwoTone />} //twoToneColor="#52c41a" />}
+          style={{minWidth: props.buttonSize}}
+        >
+          Add Patient
         </Button>
         <Drawer
-          title="Add or Modify Subject"
+          title="Add or Modify Patient"
           width={600}
           onClose={onClose}
           visible={visible}
           bodyStyle={{ paddingBottom: 80 }}
+          getContainer={false} // Remove Warning about Form.useForm() not connected to Form element
           extra={
             <Spin spinning={loading}>
                 <Space>
@@ -167,7 +174,6 @@ export const NewSubjectDrawer = (props) => {
             <Form.Item
                 name="birthDate"
                 label="Date of Birth"
-                disabledDate={disabledDate}
                 rules={[{ required: true, message: 'Please enter Date of Birth' }]}
             >
               <DatePicker
@@ -190,7 +196,7 @@ export const NewSubjectDrawer = (props) => {
               openNotificationWithIcon={props.openNotificationWithIcon}
               subjectId={searchableSubjectId}
               existsSubject={existsSubject} setExistsSubject={setExistsSubject}
-              mainTitle="Subject Search"
+              mainTitle="Search Results"
               stateFull={true}
               resultSubjectId={resultSubjectId} setResultSubjectId={setResultSubjectId}
               resultName={resultName} setResultName={setResultName}
