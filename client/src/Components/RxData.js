@@ -8,7 +8,7 @@ const RxData = (props) => {
 
     const [rxData, setRxData] = useState(null);
     const [rxTokenURI, setRxTokenURI] = useState(null);
-    const [decodedURIImage, setDecodedURIImage] = useState(null);
+    const [decodedURIImage, setDecodedURIImage] = useState('');
 
     const [patient, setPatient] = useState(null);
     const [doctorSubject, setDoctorSubject] = useState(null);
