@@ -2,12 +2,21 @@
 
 
 .connectWallet {
-  background-color: #40a9ff;
-  /* background-color: #1980ff; */
+  /* background-color: #40a9ff; */
+  background-color: #1980ff;
+
+  /* background: -webkit-linear-gradient(left, #40a9ff, #002766); */
+  background: -webkit-linear-gradient(left, #69c0ff, #002766);
+  background-size: 200% 200%;
+  animation: gradient-animation 4s ease infinite;
 }
 
 .connectWallet .ant-typography {
   color: white;
+}
+
+.connectWallet svg {
+  filter: drop-shadow(2px 2px 2px rgb(0 39 102 / 01));
 }
 
 .App {
