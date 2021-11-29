@@ -1,0 +1,1699 @@
+{
+  "contractName": "RxStructs",
+  "abi": [],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.4+commit.c7e474f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/libraries/RxStructs.sol\":\"RxStructs\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/libraries/RxStructs.sol\":{\"keccak256\":\"0xc9a42d6ffc0ba16e1474ec7a4cec2bd754464e67db941056365c3cf94cecf0b9\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://600638b4d15610259919f07d21573a80cb61e59eefcdf2d8f5585731c5bbb852\",\"dweb:/ipfs/QmUAyisqE6PGKuw7GWvsMpQqMYMsWbG7C6ditd92FToM1F\"]}},\"version\":1}",
+  "bytecode": "0x60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea26469706673582212208455897bbb585d1ee45dfed1a383e7b1756e35c1d9b31a0aebc19bb2ced3bdaf64736f6c63430008040033",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea26469706673582212208455897bbb585d1ee45dfed1a383e7b1756e35c1d9b31a0aebc19bb2ced3bdaf64736f6c63430008040033",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "57:3656:19:-:0;;;;;;;;;;;;;;;-1:-1:-1;;;57:3656:19;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "57:3656:19:-:0;;;;;;;;",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.2;\n\nlibrary RxStructs {\n\n    uint256 constant MAX_KEY_LENGTH = 20;\n    uint256 constant MAX_VALUE_LENGTH = 62;\n    uint256 constant RX_LINES = 12;\n    uint256 constant LINE_PADDING = 30;\n    \n    /// @notice enum to reflect diferent states of the Prescription\n    /// @param Draft reflects a Prescription that is not minted yet\n    /// @param Minted reflects a freshly minted Prescription, not yet ready to be used by a patient in a Pharmacy\n    /// @param Prescribed reflects a Prescription in the posession of the patient, not yet exhanged/used in a Pharmacy\n    /// @param Used reflects a Prescription in the posession of a Pharmacist, already used by a patient (it could still need to be inspected/payed by a health insurance)\n    /// @param Burned reflects a Prescription that has been Burned by the Pharmacist, because it has already been payed/accounted for\n    //TODO: enum Status { Draft, Minted, Prescribed, Used, Burned }\n\n    /// @notice struct to store a suject (person/patient) details\n    /// @param ethAddress should be a valid ethereum address (used as an Id for the subject)\n    /// @param name should contain string with the full name of the subject\n    /// @param birthDate should contain string with the date of birth of the subject\n    /// @param homeAddress should contain string with the home address of the subject\n    struct Subject {\n        address subjectId;\n        uint256 birthDate;\n        string name;\n        string homeAddress;\n    }\n\n    /// @notice struct to store a doctor (minter) details\n    /// @param subject should be a valid ethereum address (same Id as the subject that holds this doctor's personal details)\n    /// @param degree should contain string with the degree of the doctor\n    /// @param license should contain string with the legal license of the doctor\n    /// @dev @param workplaces is a feature for future implementations\n    struct Doctor {\n        address subjectId;\n        string degree;\n        string license;\n        // TODO: address[] workplaces;\n    }\n\n    /// @notice struct to store a pharmacist (burner) details\n    /// @param subject should be a valid ethereum address (same Id as the subject that holds this pharmacist's personal details)\n    /// @param degree should contain string with the degree of the pharmacist\n    /// @param license should contain string with the legal license of the pharmacist\n    /// @dev @param workplaces is a feature for future implementations\n    struct Pharmacist {\n        address subjectId;\n        string degree;\n        string license;\n        // TODO: address[] workplaces;\n    }\n\n    /// @notice struct representing the prescription\n    /// @dev @param status Represents the status of the prescription (Minted, Prescribed, Used, Burned)\n    /// @param date Date of the prescription (rounded to a timestamp of a block)\n    /// @param patient Subject with the data of the patient\n    /// @param doctorSubject Subject with the data of the doctor\n    /// @param pharmacistSubject Subject with the data of the pharmacist\n    /// @param doctor Doctor with the data of the doctor\n    /// @param pharmacist Pharmacist with the data of the pharmacist\n    /// @param keys String array with the title of each written line of the prescription\n    /// @param values String array with values of each written line of the prescription\n    struct RxData {\n        //TODO: Status status;\n        uint256 date;\n        Subject patient;\n        Subject doctorSubject;\n        Subject pharmacistSubject;\n        Doctor doctor;\n        Pharmacist pharmacist;\n        string[RX_LINES] keys;\n        string[RX_LINES] values;\n        // address pharmacistSubjectId;\n    }\n\n}",
+  "sourcePath": "/Users/matias/coding/github/blockchain-developer-bootcamp-final-project/contracts/libraries/RxStructs.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/libraries/RxStructs.sol",
+    "exportedSymbols": {
+      "RxStructs": [
+        4537
+      ]
+    },
+    "id": 4538,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 4475,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:19"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "library",
+        "fullyImplemented": true,
+        "id": 4537,
+        "linearizedBaseContracts": [
+          4537
+        ],
+        "name": "RxStructs",
+        "nameLocation": "65:9:19",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": true,
+            "id": 4478,
+            "mutability": "constant",
+            "name": "MAX_KEY_LENGTH",
+            "nameLocation": "99:14:19",
+            "nodeType": "VariableDeclaration",
+            "scope": 4537,
+            "src": "82:36:19",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 4476,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "82:7:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "hexValue": "3230",
+              "id": 4477,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "116:2:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_20_by_1",
+                "typeString": "int_const 20"
+              },
+              "value": "20"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 4481,
+            "mutability": "constant",
+            "name": "MAX_VALUE_LENGTH",
+            "nameLocation": "141:16:19",
+            "nodeType": "VariableDeclaration",
+            "scope": 4537,
+            "src": "124:38:19",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 4479,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "124:7:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "hexValue": "3632",
+              "id": 4480,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "160:2:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_62_by_1",
+                "typeString": "int_const 62"
+              },
+              "value": "62"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 4484,
+            "mutability": "constant",
+            "name": "RX_LINES",
+            "nameLocation": "185:8:19",
+            "nodeType": "VariableDeclaration",
+            "scope": 4537,
+            "src": "168:30:19",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 4482,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "168:7:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "hexValue": "3132",
+              "id": 4483,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "196:2:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_12_by_1",
+                "typeString": "int_const 12"
+              },
+              "value": "12"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 4487,
+            "mutability": "constant",
+            "name": "LINE_PADDING",
+            "nameLocation": "221:12:19",
+            "nodeType": "VariableDeclaration",
+            "scope": 4537,
+            "src": "204:34:19",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 4485,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "204:7:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "hexValue": "3330",
+              "id": 4486,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "236:2:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_30_by_1",
+                "typeString": "int_const 30"
+              },
+              "value": "30"
+            },
+            "visibility": "internal"
+          },
+          {
+            "canonicalName": "RxStructs.Subject",
+            "id": 4496,
+            "members": [
+              {
+                "constant": false,
+                "id": 4489,
+                "mutability": "mutable",
+                "name": "subjectId",
+                "nameLocation": "1430:9:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4496,
+                "src": "1422:17:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 4488,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1422:7:19",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4491,
+                "mutability": "mutable",
+                "name": "birthDate",
+                "nameLocation": "1457:9:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4496,
+                "src": "1449:17:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 4490,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1449:7:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4493,
+                "mutability": "mutable",
+                "name": "name",
+                "nameLocation": "1483:4:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4496,
+                "src": "1476:11:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4492,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1476:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4495,
+                "mutability": "mutable",
+                "name": "homeAddress",
+                "nameLocation": "1504:11:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4496,
+                "src": "1497:18:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4494,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1497:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Subject",
+            "nameLocation": "1404:7:19",
+            "nodeType": "StructDefinition",
+            "scope": 4537,
+            "src": "1397:125:19",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "RxStructs.Doctor",
+            "id": 4503,
+            "members": [
+              {
+                "constant": false,
+                "id": 4498,
+                "mutability": "mutable",
+                "name": "subjectId",
+                "nameLocation": "1970:9:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4503,
+                "src": "1962:17:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 4497,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1962:7:19",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4500,
+                "mutability": "mutable",
+                "name": "degree",
+                "nameLocation": "1996:6:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4503,
+                "src": "1989:13:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4499,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1989:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4502,
+                "mutability": "mutable",
+                "name": "license",
+                "nameLocation": "2019:7:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4503,
+                "src": "2012:14:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4501,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2012:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Doctor",
+            "nameLocation": "1945:6:19",
+            "nodeType": "StructDefinition",
+            "scope": 4537,
+            "src": "1938:134:19",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "RxStructs.Pharmacist",
+            "id": 4510,
+            "members": [
+              {
+                "constant": false,
+                "id": 4505,
+                "mutability": "mutable",
+                "name": "subjectId",
+                "nameLocation": "2540:9:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4510,
+                "src": "2532:17:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 4504,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2532:7:19",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4507,
+                "mutability": "mutable",
+                "name": "degree",
+                "nameLocation": "2566:6:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4510,
+                "src": "2559:13:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4506,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2559:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4509,
+                "mutability": "mutable",
+                "name": "license",
+                "nameLocation": "2589:7:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4510,
+                "src": "2582:14:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4508,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2582:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Pharmacist",
+            "nameLocation": "2511:10:19",
+            "nodeType": "StructDefinition",
+            "scope": 4537,
+            "src": "2504:138:19",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "RxStructs.RxData",
+            "id": 4536,
+            "members": [
+              {
+                "constant": false,
+                "id": 4512,
+                "mutability": "mutable",
+                "name": "date",
+                "nameLocation": "3450:4:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3442:12:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 4511,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "3442:7:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4515,
+                "mutability": "mutable",
+                "name": "patient",
+                "nameLocation": "3472:7:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3464:15:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                  "typeString": "struct RxStructs.Subject"
+                },
+                "typeName": {
+                  "id": 4514,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 4513,
+                    "name": "Subject",
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 4496,
+                    "src": "3464:7:19"
+                  },
+                  "referencedDeclaration": 4496,
+                  "src": "3464:7:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                    "typeString": "struct RxStructs.Subject"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4518,
+                "mutability": "mutable",
+                "name": "doctorSubject",
+                "nameLocation": "3497:13:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3489:21:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                  "typeString": "struct RxStructs.Subject"
+                },
+                "typeName": {
+                  "id": 4517,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 4516,
+                    "name": "Subject",
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 4496,
+                    "src": "3489:7:19"
+                  },
+                  "referencedDeclaration": 4496,
+                  "src": "3489:7:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                    "typeString": "struct RxStructs.Subject"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4521,
+                "mutability": "mutable",
+                "name": "pharmacistSubject",
+                "nameLocation": "3528:17:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3520:25:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                  "typeString": "struct RxStructs.Subject"
+                },
+                "typeName": {
+                  "id": 4520,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 4519,
+                    "name": "Subject",
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 4496,
+                    "src": "3520:7:19"
+                  },
+                  "referencedDeclaration": 4496,
+                  "src": "3520:7:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                    "typeString": "struct RxStructs.Subject"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4524,
+                "mutability": "mutable",
+                "name": "doctor",
+                "nameLocation": "3562:6:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3555:13:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Doctor_$4503_storage_ptr",
+                  "typeString": "struct RxStructs.Doctor"
+                },
+                "typeName": {
+                  "id": 4523,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 4522,
+                    "name": "Doctor",
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 4503,
+                    "src": "3555:6:19"
+                  },
+                  "referencedDeclaration": 4503,
+                  "src": "3555:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Doctor_$4503_storage_ptr",
+                    "typeString": "struct RxStructs.Doctor"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4527,
+                "mutability": "mutable",
+                "name": "pharmacist",
+                "nameLocation": "3589:10:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3578:21:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Pharmacist_$4510_storage_ptr",
+                  "typeString": "struct RxStructs.Pharmacist"
+                },
+                "typeName": {
+                  "id": 4526,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 4525,
+                    "name": "Pharmacist",
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 4510,
+                    "src": "3578:10:19"
+                  },
+                  "referencedDeclaration": 4510,
+                  "src": "3578:10:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Pharmacist_$4510_storage_ptr",
+                    "typeString": "struct RxStructs.Pharmacist"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4531,
+                "mutability": "mutable",
+                "name": "keys",
+                "nameLocation": "3626:4:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3609:21:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_string_storage_$12_storage_ptr",
+                  "typeString": "string[12]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "id": 4528,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3609:6:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "id": 4530,
+                  "length": {
+                    "id": 4529,
+                    "name": "RX_LINES",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 4484,
+                    "src": "3616:8:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "ArrayTypeName",
+                  "src": "3609:16:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_string_storage_$12_storage_ptr",
+                    "typeString": "string[12]"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4535,
+                "mutability": "mutable",
+                "name": "values",
+                "nameLocation": "3657:6:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3640:23:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_string_storage_$12_storage_ptr",
+                  "typeString": "string[12]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "id": 4532,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3640:6:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "id": 4534,
+                  "length": {
+                    "id": 4533,
+                    "name": "RX_LINES",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 4484,
+                    "src": "3647:8:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "ArrayTypeName",
+                  "src": "3640:16:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_string_storage_$12_storage_ptr",
+                    "typeString": "string[12]"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "RxData",
+            "nameLocation": "3394:6:19",
+            "nodeType": "StructDefinition",
+            "scope": 4537,
+            "src": "3387:323:19",
+            "visibility": "public"
+          }
+        ],
+        "scope": 4538,
+        "src": "57:3656:19",
+        "usedErrors": []
+      }
+    ],
+    "src": "32:3681:19"
+  },
+  "legacyAST": {
+    "absolutePath": "project:/contracts/libraries/RxStructs.sol",
+    "exportedSymbols": {
+      "RxStructs": [
+        4537
+      ]
+    },
+    "id": 4538,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 4475,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:23:19"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "library",
+        "fullyImplemented": true,
+        "id": 4537,
+        "linearizedBaseContracts": [
+          4537
+        ],
+        "name": "RxStructs",
+        "nameLocation": "65:9:19",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": true,
+            "id": 4478,
+            "mutability": "constant",
+            "name": "MAX_KEY_LENGTH",
+            "nameLocation": "99:14:19",
+            "nodeType": "VariableDeclaration",
+            "scope": 4537,
+            "src": "82:36:19",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 4476,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "82:7:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "hexValue": "3230",
+              "id": 4477,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "116:2:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_20_by_1",
+                "typeString": "int_const 20"
+              },
+              "value": "20"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 4481,
+            "mutability": "constant",
+            "name": "MAX_VALUE_LENGTH",
+            "nameLocation": "141:16:19",
+            "nodeType": "VariableDeclaration",
+            "scope": 4537,
+            "src": "124:38:19",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 4479,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "124:7:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "hexValue": "3632",
+              "id": 4480,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "160:2:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_62_by_1",
+                "typeString": "int_const 62"
+              },
+              "value": "62"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 4484,
+            "mutability": "constant",
+            "name": "RX_LINES",
+            "nameLocation": "185:8:19",
+            "nodeType": "VariableDeclaration",
+            "scope": 4537,
+            "src": "168:30:19",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 4482,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "168:7:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "hexValue": "3132",
+              "id": 4483,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "196:2:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_12_by_1",
+                "typeString": "int_const 12"
+              },
+              "value": "12"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 4487,
+            "mutability": "constant",
+            "name": "LINE_PADDING",
+            "nameLocation": "221:12:19",
+            "nodeType": "VariableDeclaration",
+            "scope": 4537,
+            "src": "204:34:19",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 4485,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "204:7:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "hexValue": "3330",
+              "id": 4486,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "236:2:19",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_30_by_1",
+                "typeString": "int_const 30"
+              },
+              "value": "30"
+            },
+            "visibility": "internal"
+          },
+          {
+            "canonicalName": "RxStructs.Subject",
+            "id": 4496,
+            "members": [
+              {
+                "constant": false,
+                "id": 4489,
+                "mutability": "mutable",
+                "name": "subjectId",
+                "nameLocation": "1430:9:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4496,
+                "src": "1422:17:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 4488,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1422:7:19",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4491,
+                "mutability": "mutable",
+                "name": "birthDate",
+                "nameLocation": "1457:9:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4496,
+                "src": "1449:17:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 4490,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1449:7:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4493,
+                "mutability": "mutable",
+                "name": "name",
+                "nameLocation": "1483:4:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4496,
+                "src": "1476:11:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4492,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1476:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4495,
+                "mutability": "mutable",
+                "name": "homeAddress",
+                "nameLocation": "1504:11:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4496,
+                "src": "1497:18:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4494,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1497:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Subject",
+            "nameLocation": "1404:7:19",
+            "nodeType": "StructDefinition",
+            "scope": 4537,
+            "src": "1397:125:19",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "RxStructs.Doctor",
+            "id": 4503,
+            "members": [
+              {
+                "constant": false,
+                "id": 4498,
+                "mutability": "mutable",
+                "name": "subjectId",
+                "nameLocation": "1970:9:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4503,
+                "src": "1962:17:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 4497,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1962:7:19",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4500,
+                "mutability": "mutable",
+                "name": "degree",
+                "nameLocation": "1996:6:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4503,
+                "src": "1989:13:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4499,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1989:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4502,
+                "mutability": "mutable",
+                "name": "license",
+                "nameLocation": "2019:7:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4503,
+                "src": "2012:14:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4501,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2012:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Doctor",
+            "nameLocation": "1945:6:19",
+            "nodeType": "StructDefinition",
+            "scope": 4537,
+            "src": "1938:134:19",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "RxStructs.Pharmacist",
+            "id": 4510,
+            "members": [
+              {
+                "constant": false,
+                "id": 4505,
+                "mutability": "mutable",
+                "name": "subjectId",
+                "nameLocation": "2540:9:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4510,
+                "src": "2532:17:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 4504,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2532:7:19",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4507,
+                "mutability": "mutable",
+                "name": "degree",
+                "nameLocation": "2566:6:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4510,
+                "src": "2559:13:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4506,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2559:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4509,
+                "mutability": "mutable",
+                "name": "license",
+                "nameLocation": "2589:7:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4510,
+                "src": "2582:14:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 4508,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2582:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Pharmacist",
+            "nameLocation": "2511:10:19",
+            "nodeType": "StructDefinition",
+            "scope": 4537,
+            "src": "2504:138:19",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "RxStructs.RxData",
+            "id": 4536,
+            "members": [
+              {
+                "constant": false,
+                "id": 4512,
+                "mutability": "mutable",
+                "name": "date",
+                "nameLocation": "3450:4:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3442:12:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 4511,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "3442:7:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4515,
+                "mutability": "mutable",
+                "name": "patient",
+                "nameLocation": "3472:7:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3464:15:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                  "typeString": "struct RxStructs.Subject"
+                },
+                "typeName": {
+                  "id": 4514,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 4513,
+                    "name": "Subject",
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 4496,
+                    "src": "3464:7:19"
+                  },
+                  "referencedDeclaration": 4496,
+                  "src": "3464:7:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                    "typeString": "struct RxStructs.Subject"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4518,
+                "mutability": "mutable",
+                "name": "doctorSubject",
+                "nameLocation": "3497:13:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3489:21:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                  "typeString": "struct RxStructs.Subject"
+                },
+                "typeName": {
+                  "id": 4517,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 4516,
+                    "name": "Subject",
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 4496,
+                    "src": "3489:7:19"
+                  },
+                  "referencedDeclaration": 4496,
+                  "src": "3489:7:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                    "typeString": "struct RxStructs.Subject"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4521,
+                "mutability": "mutable",
+                "name": "pharmacistSubject",
+                "nameLocation": "3528:17:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3520:25:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                  "typeString": "struct RxStructs.Subject"
+                },
+                "typeName": {
+                  "id": 4520,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 4519,
+                    "name": "Subject",
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 4496,
+                    "src": "3520:7:19"
+                  },
+                  "referencedDeclaration": 4496,
+                  "src": "3520:7:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Subject_$4496_storage_ptr",
+                    "typeString": "struct RxStructs.Subject"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4524,
+                "mutability": "mutable",
+                "name": "doctor",
+                "nameLocation": "3562:6:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3555:13:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Doctor_$4503_storage_ptr",
+                  "typeString": "struct RxStructs.Doctor"
+                },
+                "typeName": {
+                  "id": 4523,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 4522,
+                    "name": "Doctor",
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 4503,
+                    "src": "3555:6:19"
+                  },
+                  "referencedDeclaration": 4503,
+                  "src": "3555:6:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Doctor_$4503_storage_ptr",
+                    "typeString": "struct RxStructs.Doctor"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4527,
+                "mutability": "mutable",
+                "name": "pharmacist",
+                "nameLocation": "3589:10:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3578:21:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Pharmacist_$4510_storage_ptr",
+                  "typeString": "struct RxStructs.Pharmacist"
+                },
+                "typeName": {
+                  "id": 4526,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 4525,
+                    "name": "Pharmacist",
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 4510,
+                    "src": "3578:10:19"
+                  },
+                  "referencedDeclaration": 4510,
+                  "src": "3578:10:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Pharmacist_$4510_storage_ptr",
+                    "typeString": "struct RxStructs.Pharmacist"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4531,
+                "mutability": "mutable",
+                "name": "keys",
+                "nameLocation": "3626:4:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3609:21:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_string_storage_$12_storage_ptr",
+                  "typeString": "string[12]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "id": 4528,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3609:6:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "id": 4530,
+                  "length": {
+                    "id": 4529,
+                    "name": "RX_LINES",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 4484,
+                    "src": "3616:8:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "ArrayTypeName",
+                  "src": "3609:16:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_string_storage_$12_storage_ptr",
+                    "typeString": "string[12]"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 4535,
+                "mutability": "mutable",
+                "name": "values",
+                "nameLocation": "3657:6:19",
+                "nodeType": "VariableDeclaration",
+                "scope": 4536,
+                "src": "3640:23:19",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_string_storage_$12_storage_ptr",
+                  "typeString": "string[12]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "id": 4532,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3640:6:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "id": 4534,
+                  "length": {
+                    "id": 4533,
+                    "name": "RX_LINES",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 4484,
+                    "src": "3647:8:19",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "ArrayTypeName",
+                  "src": "3640:16:19",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_string_storage_$12_storage_ptr",
+                    "typeString": "string[12]"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "RxData",
+            "nameLocation": "3394:6:19",
+            "nodeType": "StructDefinition",
+            "scope": 4537,
+            "src": "3387:323:19",
+            "visibility": "public"
+          }
+        ],
+        "scope": 4538,
+        "src": "57:3656:19",
+        "usedErrors": []
+      }
+    ],
+    "src": "32:3681:19"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.4+commit.c7e474f2.Emscripten.clang"
+  },
+  "networks": {
+    "4": {
+      "events": {},
+      "links": {},
+      "address": "0xA81F6653655A8530B01d3B225f8CEf052422a4B4",
+      "transactionHash": "0x03dabff92483144b2bc8a1bd4f699812b70f2b9470321f6c30fb177787124931"
+    }
+  },
+  "schemaVersion": "3.4.3",
+  "updatedAt": "2021-11-29T05:09:26.866Z",
+  "networkType": "ethereum",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
