@@ -53,19 +53,23 @@ library RxStructs {
     }
 
     /// @notice struct representing the prescription
-    /// @param status Represents the status of the prescription (Minted, Prescribed, Used, Burned)
-    /// @param patientSubjectId Id of the patient
-    /// @param doctorSubjectId Id of the doctor
+    /// @dev @param status Represents the status of the prescription (Minted, Prescribed, Used, Burned)
     /// @param date Date of the prescription (rounded to a timestamp of a block)
+    /// @param patient Subject with the data of the patient
+    /// @param doctorSubject Subject with the data of the doctor
+    /// @param pharmacistSubject Subject with the data of the pharmacist
+    /// @param doctor Doctor with the data of the doctor
+    /// @param pharmacist Pharmacist with the data of the pharmacist
     /// @param keys String array with the title of each written line of the prescription
     /// @param values String array with values of each written line of the prescription
-    /// @dev @param pharmacistSubjectId Possible future feature: Id of the pharmacist to assign a Pharmacist on the moment of Prescribing
     struct RxData {
         //TODO: Status status;
         uint256 date;
         Subject patient;
         Subject doctorSubject;
+        Subject pharmacistSubject;
         Doctor doctor;
+        Pharmacist pharmacist;
         string[RX_LINES] keys;
         string[RX_LINES] values;
         // address pharmacistSubjectId;

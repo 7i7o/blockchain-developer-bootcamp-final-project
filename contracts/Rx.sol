@@ -52,10 +52,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Modifier that checks that an account is actually a registered subject
     modifier isSubject(address _subjectId) {
         require( (_subjectId != address(0) && subjects[_subjectId].subjectId == _subjectId) ,
-                    string(abi.encodePacked(
-                        Strings.toHexString(uint160(_subjectId), 20),
-                        'is not a registered Subject'
-                    ))
+                    'not a subject'
                 );
         _;
     }
@@ -63,10 +60,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Modifier that checks that an account is a registered doctor
     modifier isDoctor(address _subjectId) {
         require( (_subjectId != address(0) && doctors[_subjectId].subjectId == _subjectId) ,
-                    string(abi.encodePacked(
-                        Strings.toHexString(uint160(_subjectId), 20),
-                        'is not a registered Doctor!'
-                    ))
+                    'not a doctor'
                 );
         _;
     }
@@ -74,10 +68,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Modifier that checks that an account is NOT a registered doctor
     modifier isNotDoctor(address _subjectId) {
         require( (doctors[_subjectId].subjectId == address(0)) ,
-                    string(abi.encodePacked(
-                        Strings.toHexString(uint160(_subjectId), 20),
-                        'is still a registered Doctor!'
-                    ))
+                    'is a Doctor'
                 );
         _;
     }
@@ -85,10 +76,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Modifier that checks that an account is a registered pharmacist
     modifier isPharmacist(address _subjectId) {
         require( (_subjectId != address(0) && pharmacists[_subjectId].subjectId == _subjectId) ,
-                    string(abi.encodePacked(
-                        Strings.toHexString(uint160(_subjectId), 20),
-                        'is not a registered Pharmacist!'
-                    ))
+                    'not a pharmacist'
                 );
         _;
     }
@@ -96,10 +84,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Modifier that checks that an account is NOT a registered pharmacist
     modifier isNotPharmacist(address _subjectId) {
         require( (pharmacists[_subjectId].subjectId == address(0)) ,
-                    string(abi.encodePacked(
-                        Strings.toHexString(uint160(_subjectId), 20),
-                        'is still a registered Pharmacist!'
-                    ))
+                    'is a pharmacist'
                 );
         _;
     }
@@ -170,18 +155,24 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     }
 
     /// @dev function override required by solidity
+    /// @notice function override to store burner data in the rx before burning
     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) onlyRole(BURNER_ROLE) {
         // delete rxs[tokenId]; // Keep Rx Data to be able to view past Rxs
+        require(
+            getApproved(tokenId) == msg.sender ||
+            isApprovedForAll(ownerOf(tokenId), msg.sender),
+            "pharmacist not approved");
+        // We save the burner (pharmacist) data to the Rx
+        rxs[tokenId].pharmacistSubject = getSubject(msg.sender);
+        rxs[tokenId].pharmacist = getPharmacist(msg.sender);
         super._burn(tokenId);
         //TODO: Change prescription life cycle in 'Status' to keep prescription data without burning
     }
 
     /// @dev TokenURI generated on the fly from stored data (function override required by solidity)  
     function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
-        require(_exists(tokenId), "ERC721URIStorage: URI query for nonexistent token");
-
+        require(_exists(tokenId), "nonexistent token");
         return TokenURIDescriptor.constructTokenURI(tokenId, name(), symbol(), rxs[tokenId]);
-
     }
 
     /// @dev function override required by solidity
@@ -213,10 +204,9 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
         isSubject(to) 
         // validateInputs(_keys, _values)
         {
-            require( (msg.sender != to) , 'Cannot mint NFT Prescription to yourself');
- 
-            require( _validateStrings( MAX_KEY_LENGTH, _keys ) , 'Key exceeds max length (19)' );
-            require( _validateStrings( MAX_VALUE_LENGTH, _values ) , 'Value exceeds max length (61)' );
+            require( (msg.sender != to) , 'mint to yourself');
+            require( _validateStrings( MAX_KEY_LENGTH, _keys ) , 'key too long' );
+            require( _validateStrings( MAX_VALUE_LENGTH, _values ) , 'value too long' );
 
             uint256 tokenId = _tokenIdCounter.current();
             _tokenIdCounter.increment();
@@ -227,13 +217,39 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
                                 block.timestamp,
                                 getSubject(to),
                                 getSubject(msg.sender),
+                                RxStructs.Subject(address(0), 0, '', ''),
                                 getDoctor(msg.sender),
+                                RxStructs.Pharmacist(address(0), '', ''),
                                 _keys,
                                 _values);
 
             emit minted(msg.sender, to, tokenId);
             //TODO: Add life cycle Status to the prescription
             // rxs[tokenId] = RxData(Status.Draft, block.timestamp, getSubject(to), getSubject(msg.sender), getDoctor(msg.sender), _keys, _values);
+    }
+
+    /// @notice Function to get data for a specific tokenId. Only for Doctor, Patient or Pharmacist of the tokenId.
+    /// @param tokenId uint256 representing an existing tokenId
+    /// @return a RxData struct containing all the Rx Data
+    function getRx(uint256 tokenId) public view returns (RxStructs.RxData memory) {
+        return rxs[tokenId];
+    }
+
+    // /// @notice function override to only approve pharmacists and register the pharmacist data
+    // function approve(address to, uint256 tokenId) public override(ERC721) {
+    //     require(to == address(0) || pharmacists[to].subjectId == to, "Rx: approve to non-pharmacist");
+    //     super.approve(to, tokenId);
+    // }
+
+    // /// @notice function override to only approve pharmacists
+    // function setApprovalForAll(address operator, bool approved) public override(ERC721) {
+    //     require(operator == address(0) || pharmacists[operator].subjectId == operator, "Rx: setApprovalForAll to non-pharmacist");
+    //     super.setApprovalForAll(operator, approved);
+    // }
+
+    /// @notice function override to prohibit token transfers
+    function _transfer(address from, address to, uint256 tokenId ) internal view override(ERC721) {
+        require(msg.sender == address(0), "rxs are untransferable");
     }
 
     /// @notice Function to add an admin account
@@ -250,6 +266,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
 
     /// @notice Function to check if someone has admin role
     /// @param to address to check for admin role privilege
+    /// @return true if @param to is an admin or false otherwise
     function isAdmin(address to) public view returns (bool) {
         return hasRole(ADMIN_ROLE, to);
     }
@@ -295,7 +312,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
         public
         onlyRole(ADMIN_ROLE)
         returns (address) {
-            require (_subjectId != address(0), "Wallet Address cannot be 0x0");
+            require (_subjectId != address(0), "0 address");
             // Subject memory newSubject = Subject(_subjectId, _name, _birthDate, _homeAddress);
             // subjects[_subjectId] = newSubject;
             subjects[_subjectId] = RxStructs.Subject(_subjectId, _birthDate, _name, _homeAddress);
