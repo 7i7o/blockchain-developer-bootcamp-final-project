@@ -1,5 +1,14 @@
 @import '~antd/dist/antd.css';
-/* @import '~antd/dist/antd.dark.less'; */
+
+
+.connectWallet {
+  background-color: #40a9ff;
+  /* background-color: #1980ff; */
+}
+
+.connectWallet .ant-typography {
+  color: white;
+}
 
 .App {
   width: 100%;

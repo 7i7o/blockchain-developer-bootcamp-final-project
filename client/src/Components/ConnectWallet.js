@@ -124,7 +124,7 @@ const ConnectWallet = (props) => {
       props.setContract(null);
     }
 
-    return (<Row style={{ width: "100%", backgroundColor: "lightgrey", padding: 10 }}>
+    return (<Row style={{ width: "100%", padding: 10 }} className='connectWallet'>
             {
               <Col span={4} style={{ display: 'flex', justifyContent: 'left', alignItems: 'baseline', maxHeight: 30 }}>
                 <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 120 120" style={{minWidth:120,maxWidth:120}}>
@@ -145,9 +145,10 @@ const ConnectWallet = (props) => {
                   )}
                   { props.connection && !props.rightNetwork && (
                     <div style={{ float: 'right' }}>
-                        <Typography.Text strong>Rx only works on </Typography.Text>
+                        {/* <Typography.Text strong>Rx only works on </Typography.Text>
                         <Typography.Link href="https://faucet.rinkeby.io/" target="_blank">Rinkeby</Typography.Link>
-                        <Typography.Text strong>. Please change your network.</Typography.Text>
+                        <Typography.Text strong>. Please change your network.</Typography.Text> */}
+                        <Typography.Text strong>Rx only works on Rinkeby. Please change your network.</Typography.Text>
                     </div>
                   )}
                   { props.connection && props.rightNetwork && !loggedIn && (
