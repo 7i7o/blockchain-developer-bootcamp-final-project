@@ -13,7 +13,7 @@ const MainMenu = (props) => {
                 </Col>
             </Row>)
         }
-        {/* {props.contract && 
+        {props.contract && 
             (<Row className="centerChilds">
                 <Col span={24} className="centerChilds" style={{padding:5}}>
                     <ListRxDrawer
@@ -22,10 +22,16 @@ const MainMenu = (props) => {
                         openNotificationWithIcon={props.openNotificationWithIcon}
                         accountAction='List'
                         objectName='Rx'
-                        />
+                        drawerWidth={props.drawerWidth}
+                        buttonSize={props.buttonSize}
+                        // If Patient, can't filter list. Else, a search for patient/Token should show
+                        parentObjectName={ props.objectName }
+                        // asyncContractCallback={props.contract.filters.minted}
+                        // subjectId = { props.account }
+                    />
                 </Col>
             </Row>)
-        } */}
+        }
         {props.objectName === "Doctor" && props.contract && 
             (<Row className="centerChilds">
                 <Col span={24} className="centerChilds" style={{padding:5}}>
@@ -33,6 +39,8 @@ const MainMenu = (props) => {
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
+                        drawerWidth={props.drawerWidth}
+                        buttonSize={props.buttonSize}
                     />
                 </Col>
             </Row>)

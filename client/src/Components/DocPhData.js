@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Row, Spin, Typography } from 'antd';
+import { Card, Col, Row, Spin } from 'antd';
 
 const DocPhData = (props) => {
 
@@ -24,16 +24,16 @@ const DocPhData = (props) => {
 
         if (result) {
             setDocPhData({
-                            subjectId: result[0],
-                            degree: result[1],
-                            license: result[2]
+                            subjectId: result.subjectId,
+                            degree: result.degree,
+                            license: result.license
             });
             if (props.stateFull) {
-                props.setResultSubjectId(result[0]);
-                props.setResultDegree(result[1]);
-                props.setResultLicense(result[2]);
+                props.setResultSubjectId(result.subjectId);
+                props.setResultDegree(result.degree);
+                props.setResultLicense(result.license);
             }
-            if (result[1] && result[1].length) {
+            if (result.degree && result.degree.length) {
                 props.setExistsDocPh(true);
             } else {
                 props.setExistsDocPh(false);
@@ -46,26 +46,47 @@ const DocPhData = (props) => {
         setLoading(false);
     }
 
+    const keyStyle={
+        textAlign: 'right',
+        paddingRight: 5,
+    }
+    const valueStyle= { 
+        textAlign: 'left',
+        fontFamily: 'SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace',
+        fontWeight: 'bold',
+    }
+    const headStyle= {
+        border: 'none',
+    }
+    const bodyStyle = {
+        paddingTop: 1,
+    }
+
     return (
         <Spin spinning={loading}>
-        { props.contract && !props.existsDocPh &&
-            (
-            <Row style={{ paddingTop: 20 }}>
-                <Col span={24} style={{ textAlign: 'center'}}><Typography.Title level={5}>{props.objectName} Info Not Found</Typography.Title></Col>
-            </Row>
-            )
-        }
-        { props.contract && props.existsDocPh &&
-            (
-            <Row style={{ paddingTop: 20 }}>
-                <Col span={24} style={{ textAlign: 'center'}}><Typography.Title level={5}>{props.objectName} Info</Typography.Title></Col>
-                <Col span={6} style={{ textAlign: 'right', paddingRight: 5 }}>Account Address:</Col><Col span={18}>{docPhData.subjectId}</Col>
-                <Col span={6} style={{ textAlign: 'right', paddingRight: 5 }}>Degree:</Col><Col span={18}>{docPhData.degree}</Col>
-                <Col span={6} style={{ textAlign: 'right', paddingRight: 5 }}>License:</Col><Col span={18}>{docPhData.license}</Col>
-            </Row>
-            )
-        }
-        </Spin>   
+            {props.contract &&
+                <Card
+                className='cAlign'
+                bordered={false}
+                title={`${props.objectName} Info${ (!props.existsDocPh) ? ' Not Found' : ''}`}
+                headStyle={ headStyle }
+                bodyStyle={bodyStyle}
+                >
+                    { props.existsDocPh && (
+                        <Row>
+                            <Col span={6} style={ keyStyle }>Account Address:</Col>
+                            <Col span={18} style={ valueStyle }>{docPhData.subjectId}</Col>
+
+                            <Col span={6} style={ keyStyle }>Degree:</Col>
+                            <Col span={18} style={ valueStyle }>{docPhData.degree}</Col>
+
+                            <Col span={6} style={ keyStyle }>License:</Col>
+                            <Col span={18} style={ valueStyle }>{docPhData.license}</Col>
+                        </Row> )
+                    }
+                </Card>
+            }
+        </Spin>
     )
 }
 

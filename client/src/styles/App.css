@@ -18,7 +18,18 @@
   padding: 5;
 }
 
+.ant-drawer-content-wrapper {
+  width: 650px;
+}
+
 .rAlign { text-align: right; }
+.cAlign { display: block;
+          margin-left: auto;
+          margin-right: auto;
+          /* justify-content: center;
+          justify-self: center; */
+          text-align: center; 
+        }
 
 div.ant-form-item { margin-bottom: 12;}
 

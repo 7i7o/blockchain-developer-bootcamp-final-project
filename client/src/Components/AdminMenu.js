@@ -4,8 +4,6 @@ import NewSubjectDrawer from './NewSubjectDrawer';
 import NewDocPhDrawer from './NewDocPhDrawer';
 import AccountActionDrawer from './AccountActionDrawer';
 
-const BUTTON_SIZE = "200px"; // All buttons, same width
-// const BUTTON_SIZE = "2"; // All buttons, different widths
 
 const AdminMenu = (props) => {
 
@@ -41,7 +39,11 @@ const AdminMenu = (props) => {
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
-                        buttonSize={BUTTON_SIZE}
+                        buttonSize={props.buttonSize}
+                        drawerWidth={props.drawerWidth}
+                        accountAction="Add"
+                        objectName="Patient"
+                        asyncContractCallback={props.contract.setSubjectData}
                     />
                 </Col>
                 <Col span={24} className="centerChilds" style={{padding:5}}>
@@ -49,7 +51,8 @@ const AdminMenu = (props) => {
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
-                        buttonSize={BUTTON_SIZE}
+                        buttonSize={props.buttonSize}
+                        drawerWidth={props.drawerWidth}
                         accountAction="Remove"
                         objectName="Patient"
                         asyncContractCallback={props.contract.removeSubject}
@@ -60,7 +63,8 @@ const AdminMenu = (props) => {
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
-                        buttonSize={BUTTON_SIZE}
+                        buttonSize={props.buttonSize}
+                        drawerWidth={props.drawerWidth}
                         asyncContractCallback={props.contract.setDoctorData}
                         objectName="Doctor"
                     />
@@ -70,7 +74,8 @@ const AdminMenu = (props) => {
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
-                        buttonSize={BUTTON_SIZE}
+                        buttonSize={props.buttonSize}
+                        drawerWidth={props.drawerWidth}
                         accountAction="Remove"
                         objectName="Doctor"
                         asyncContractCallback={props.contract.removeDoctor}
@@ -81,7 +86,8 @@ const AdminMenu = (props) => {
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
-                        buttonSize={BUTTON_SIZE}
+                        buttonSize={props.buttonSize}
+                        drawerWidth={props.drawerWidth}
                         asyncContractCallback={props.contract.setPharmacistData}
                         objectName="Pharmacist"
                     />
@@ -91,7 +97,8 @@ const AdminMenu = (props) => {
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
-                        buttonSize={BUTTON_SIZE}
+                        buttonSize={props.buttonSize}
+                        drawerWidth={props.drawerWidth}
                         accountAction="Remove"
                         objectName="Pharmacist"
                         asyncContractCallback={props.contract.removePharmacist}
@@ -102,7 +109,8 @@ const AdminMenu = (props) => {
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
-                        buttonSize={BUTTON_SIZE}
+                        buttonSize={props.buttonSize}
+                        drawerWidth={props.drawerWidth}
                         accountAction="Add"
                         objectName="Admin"
                         asyncContractCallback={props.contract.addAdmin}
@@ -113,7 +121,8 @@ const AdminMenu = (props) => {
                         account={props.account}
                         contract={props.contract}
                         openNotificationWithIcon={props.openNotificationWithIcon}
-                        buttonSize={BUTTON_SIZE}
+                        buttonSize={props.buttonSize}
+                        drawerWidth={props.drawerWidth}
                         accountAction="Remove"
                         objectName="Admin"
                         asyncContractCallback={props.contract.removeAdmin}

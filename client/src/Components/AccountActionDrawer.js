@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Drawer, Form, Button, Input, Space, Spin } from 'antd';
 import { MinusCircleTwoTone, PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
-import SubjectData from './SubjectData';
-import DocPhData from './DocPhData';
+import UserFullInfo from './UserFullInfo';
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -142,7 +141,7 @@ export const AccountActionDrawer = (props) => {
         </Button>
         <Drawer
           title={`${props.accountAction} ${props.objectName}`}
-          width={600}
+          width={props.drawerWidth}
           onClose={onClose}
           visible={visible}
           bodyStyle={{ paddingBottom: 80 }}
@@ -167,40 +166,16 @@ export const AccountActionDrawer = (props) => {
               <Input placeholder="0x..." disabled={loading} />
             </Form.Item>
           </Form>
-
-          {
-            ( <SubjectData 
+          <UserFullInfo
               account={props.account}
               contract={props.contract}
               openNotificationWithIcon={props.openNotificationWithIcon}
               subjectId={searchableSubjectId}
               existsSubject={existsSubject} setExistsSubject={setExistsSubject}
+              existsDoctor={existsDoctor} setExistsDoctor={setExistsDoctor}
+              existsPharmacist={existsPharmacist} setExistsPharmacist={setExistsPharmacist}
               mainTitle="Search Results"
-              stateFull={false}
-            /> )
-          }
-          { props.contract &&
-            ( <DocPhData
-                account={props.account}
-                contract={props.contract}
-                openNotificationWithIcon={props.openNotificationWithIcon}
-                subjectId={searchableSubjectId}
-                existsDocPh={existsDoctor} setExistsDocPh={setExistsDoctor}
-                asyncContractCallback={props.contract.getDoctor}
-                objectName="Doctor"
-            /> )
-          }
-          { props.contract &&
-            ( <DocPhData
-                account={props.account}
-                contract={props.contract}
-                openNotificationWithIcon={props.openNotificationWithIcon}
-                subjectId={searchableSubjectId}
-                existsDocPh={existsPharmacist} setExistsDocPh={setExistsPharmacist}
-                asyncContractCallback={props.contract.getPharmacist}
-                objectName="Pharmacist"
-            /> )
-          }
+          />
         </Drawer>
       </>
     );

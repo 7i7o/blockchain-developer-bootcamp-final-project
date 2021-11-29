@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 
-import SubjectData from './SubjectData'
-import DocPhData from './DocPhData'
 import AdminMenu from './AdminMenu';
 import MainMenu from './MainMenu';
+import UserFullInfo from './UserFullInfo';
+
+const DRAWER_WIDTH = '';
+const BUTTON_SIZE = "200px"; // All buttons, same width
+// const BUTTON_SIZE = "2"; // All buttons, different widths
 
 const Landing = (props) => {
 
@@ -18,7 +21,10 @@ const Landing = (props) => {
                 contract={props.contract}
                 openNotificationWithIcon={props.openNotificationWithIcon}
                 objectName="Patient"
-            />)
+                // subjectId={props.account}
+                drawerWidth={DRAWER_WIDTH}
+                buttonSize={BUTTON_SIZE}
+                />)
         }
         { props.contract && existsDoctor && 
             (<MainMenu
@@ -26,7 +32,10 @@ const Landing = (props) => {
                 contract={props.contract}
                 openNotificationWithIcon={props.openNotificationWithIcon}
                 objectName="Doctor"
-            />)
+                // subjectId={''}
+                drawerWidth={DRAWER_WIDTH}
+                buttonSize={BUTTON_SIZE}
+                />)
         }
         { props.contract && existsPharmacist && 
             (<MainMenu
@@ -34,47 +43,34 @@ const Landing = (props) => {
                 contract={props.contract}
                 openNotificationWithIcon={props.openNotificationWithIcon}
                 objectName="Pharmacist"
-            />)
+                // subjectId={''}
+                drawerWidth={DRAWER_WIDTH}
+                buttonSize={BUTTON_SIZE}
+                />)
         }
         { props.contract &&
             (<AdminMenu 
                 account={props.account}
                 contract={props.contract}
                 openNotificationWithIcon={props.openNotificationWithIcon}
+                drawerWidth={DRAWER_WIDTH}
+                buttonSize={BUTTON_SIZE}
                 />)
         }
         { props.contract &&
-            ( <SubjectData 
-                account={props.account}
-                contract={props.contract}
-                openNotificationWithIcon={props.openNotificationWithIcon}
-                subjectId={props.account}
-                existsSubject={existsSubject} setExistsSubject={setExistsSubject}
-                mainTitle="Your Info"
-            /> )
-        }
-        { props.contract &&
-            ( <DocPhData
-                account={props.account}
-                contract={props.contract}
-                openNotificationWithIcon={props.openNotificationWithIcon}
-                subjectId={props.account}
-                existsDocPh={existsDoctor} setExistsDocPh={setExistsDoctor}
-                asyncContractCallback={props.contract.getDoctor}
-                objectName="Doctor"
-            /> )
-        }
-        { props.contract &&
-            ( <DocPhData
-                account={props.account}
-                contract={props.contract}
-                openNotificationWithIcon={props.openNotificationWithIcon}
-                subjectId={props.account}
-                existsDocPh={existsPharmacist} setExistsDocPh={setExistsPharmacist}
-                asyncContractCallback={props.contract.getPharmacist}
-                objectName="Pharmacist"
-            /> )
-        }
+            (
+                <UserFullInfo
+                    account={props.account}
+                    contract={props.contract}
+                    openNotificationWithIcon={props.openNotificationWithIcon}
+                    subjectId={props.account}
+                    existsSubject={existsSubject} setExistsSubject={setExistsSubject}
+                    existsDoctor={existsDoctor} setExistsDoctor={setExistsDoctor}
+                    existsPharmacist={existsPharmacist} setExistsPharmacist={setExistsPharmacist}
+                    mainTitle="Your Info"
+                />
+            )
+        }   
     </>)
 }
 

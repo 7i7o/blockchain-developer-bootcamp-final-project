@@ -113,12 +113,17 @@ export const MintRxDrawer = (props) => {
 
     return (
       <>
-        <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
+        <Button
+          type="primary"
+          onClick={showDrawer}
+          icon={<PlusOutlined />}
+          style={{minWidth: props.buttonSize}}
+        >
           Prescribe Rx
         </Button>
         <Drawer
           title="Prescription Data"
-          width={600}
+          width={props.drawerWidth}
           onClose={onClose}
           visible={visible}
           bodyStyle={{ paddingBottom: 80 }}

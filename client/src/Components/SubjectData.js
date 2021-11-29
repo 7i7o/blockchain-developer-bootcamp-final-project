@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Row, Spin, Typography } from 'antd';
+import { Card, Col, Row, Spin } from 'antd';
 
 const SubjectData = (props) => {
 
@@ -23,20 +23,20 @@ const SubjectData = (props) => {
         } catch (error) { console.log(error); setLoading(false); }
         
         if (result) {
-            let birthDate = new Date(result[1].toNumber() * 1000);// + 0*3*60*60*1000);
+            let birthDate = new Date(result.birthDate.toNumber() * 1000);// + 0*3*60*60*1000);
             setSubjectData({
-                            subjectId: result[0],
-                            name: result[2],
+                            subjectId: result.subjectId,
+                            name: result.name,
                             birthDate: birthDate,
-                            homeAddress: result[3]
+                            homeAddress: result.homeAddress
             });
             if (props.stateFull) {
-                props.setResultSubjectId(result[0]);
-                props.setResultName(result[2]);
+                props.setResultSubjectId(result.subjectId);
+                props.setResultName(result.name);
                 props.setResultBirthDate(birthDate);
-                props.setResultHomeAddress(result[3]);
+                props.setResultHomeAddress(result.homeAddress);
             }
-            if (result[2] && result[2].length) {
+            if (result.name && result.name.length) {
                 props.setExistsSubject(true);
             } else {
                 props.setExistsSubject(false);
@@ -49,37 +49,49 @@ const SubjectData = (props) => {
         setLoading(false);
     }
 
+    const keyStyle={
+        textAlign: 'right',
+        paddingRight: 5,
+    }
+    const valueStyle= { 
+        textAlign: 'left',
+        fontFamily: 'SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace',
+        fontWeight: 'bold',
+    }
+    const headStyle= {
+        border: 'none',
+    }
+    const bodyStyle = {
+        paddingTop: 1,
+    }
+
     return (
         <Spin spinning={loading}>
-        { props.contract && props.mainTitle &&
-            (
-            <Row style={{ paddingTop: 40 }}>
-                <Col span={24} style={{ textAlign: 'center'}}>
-                    <Typography.Title level={3}>
-                        {props.mainTitle}
-                    </Typography.Title>
-                </Col>
-            </Row>
-            )
-        }
-        { props.contract && !props.existsSubject &&
-            (
-            <Row style={{ paddingTop: 20 }}>
-                <Col span={24} style={{ textAlign: 'center'}}><Typography.Title level={5}>Patient Info Not Found</Typography.Title></Col>
-            </Row>
-            )
-        }
-        { props.contract && props.existsSubject &&
-            (
-            <Row style={{ paddingTop: 20 }}>
-                <Col span={24} style={{ textAlign: 'center'}}><Typography.Title level={5}>Patient Info</Typography.Title></Col>
-                <Col span={6} style={{ textAlign: 'right', paddingRight: 5 }}>Account Address:</Col><Col span={18}>{subjectData.subjectId}</Col>
-                <Col span={6} style={{ textAlign: 'right', paddingRight: 5 }}>Full Name:</Col><Col span={18}>{subjectData.name}</Col>
-                <Col span={6} style={{ textAlign: 'right', paddingRight: 5 }}>Date of Birth:</Col><Col span={18}>{subjectData.birthDate.toDateString()}</Col>
-                <Col span={6} style={{ textAlign: 'right', paddingRight: 5 }}>Home Address:</Col><Col span={18}>{subjectData.homeAddress}</Col>
-            </Row>
-            )
-        }
+            {props.contract &&
+                <Card
+                    className='cAlign'
+                    bordered={false}
+                    title={`Patient Info${ (!props.existsSubject) ? ' Not Found' : ''}`}
+                    headStyle={ headStyle }
+                    bodyStyle={bodyStyle}
+                >
+                    { props.existsSubject && (
+                        <Row>
+                            <Col span={6} style={ keyStyle }>Account Address:</Col>
+                            <Col span={18} style={ valueStyle }>{subjectData.subjectId}</Col>
+
+                            <Col span={6} style={ keyStyle }>Full Name:</Col>
+                            <Col span={18} style={ valueStyle }>{subjectData.name}</Col>
+
+                            <Col span={6} style={ keyStyle }>Date of Birth:</Col>
+                            <Col span={18} style={ valueStyle }>{subjectData.birthDate.toDateString()}</Col>
+
+                            <Col span={6} style={ keyStyle }>Home Address:</Col>
+                            <Col span={18} style={ valueStyle }>{subjectData.homeAddress}</Col>
+                        </Row> )
+                    }
+                </Card>
+            }
         </Spin>
     )
 }

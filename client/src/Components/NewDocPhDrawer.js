@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Drawer, Form, Button, Input, Space, Spin } from 'antd';
 import { PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
-import SubjectData from './SubjectData';
-import DocPhData from './DocPhData';
+import UserFullInfo from './UserFullInfo';
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -130,7 +129,7 @@ const NewDocPhDrawer = (props) => {
         <Drawer
           title={`Add or Modify ${props.objectName}`}
         //   width={720}
-          width={600}
+          width={props.drawerWidth}
           onClose={onClose}
           visible={visible}
           bodyStyle={{ paddingBottom: 80 }}
@@ -169,47 +168,20 @@ const NewDocPhDrawer = (props) => {
                 <Input placeholder="Please enter License" disabled={!validAccount || !existsSubject || loading} />
             </Form.Item>
           </Form>
-          {
-            ( <SubjectData 
+          <UserFullInfo
               account={props.account}
               contract={props.contract}
               openNotificationWithIcon={props.openNotificationWithIcon}
               subjectId={searchableSubjectId}
               existsSubject={existsSubject} setExistsSubject={setExistsSubject}
+              existsDoctor={existsDoctor} setExistsDoctor={setExistsDoctor}
+              existsPharmacist={existsPharmacist} setExistsPharmacist={setExistsPharmacist}
+              stateFullObject={props.objectName}
+              resultSubjectId={resultSubjectId} setResultSubjectId={setResultSubjectId}
+              resultDegree={resultDegree} setResultDegree={setResultDegree}
+              resultLicense={resultLicense} setResultLicense={setResultLicense}
               mainTitle="Search Results"
-            /> )
-          }
-          { props.contract &&
-            ( <DocPhData
-                account={props.account}
-                contract={props.contract}
-                openNotificationWithIcon={props.openNotificationWithIcon}
-                subjectId={searchableSubjectId}
-                existsDocPh={existsDoctor} setExistsDocPh={setExistsDoctor}
-                asyncContractCallback={props.contract.getDoctor}
-                objectName="Doctor"
-                stateFull={props.objectName === "Doctor"}
-                resultSubjectId={resultSubjectId} setResultSubjectId={setResultSubjectId}
-                resultDegree={resultDegree} setResultDegree={setResultDegree}
-                resultLicense={resultLicense} setResultLicense={setResultLicense}
-              /> )
-        }
-        { props.contract &&
-            ( <DocPhData
-                account={props.account}
-                contract={props.contract}
-                openNotificationWithIcon={props.openNotificationWithIcon}
-                subjectId={searchableSubjectId}
-                existsDocPh={existsPharmacist} setExistsDocPh={setExistsPharmacist}
-                asyncContractCallback={props.contract.getPharmacist}
-                objectName="Pharmacist"
-                stateFull={props.objectName === "Pharmacist"}
-                resultSubjectId={resultSubjectId} setResultSubjectId={setResultSubjectId}
-                resultDegree={resultDegree} setResultDegree={setResultDegree}
-                resultLicense={resultLicense} setResultLicense={setResultLicense}
-            /> )
-        }
-
+          />
         </Drawer>
       </>
     );
