@@ -38,7 +38,7 @@ const App = () => {
           />
         )}
         {(
-          <div className="cAlign" style={{ paddingTop: 40 }}>
+          <div className="cAlign socialLinks" style={{ paddingTop: 40 }}>
             <Typography.Link target='_blank' href='https://github.com/7i7o/blockchain-developer-bootcamp-final-project.git'>
               <GithubOutlined style={{ fontSize: 31, paddingRight: 10 }}/>
             </Typography.Link>
