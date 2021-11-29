@@ -61,20 +61,21 @@ export const AccountActionDrawer = (props) => {
         /* Here goes the Web3 Contract Call !!! */
         setLoading(true);
 
-        const txn = await props.asyncContractCallback(
-            values.accountAddress
-        );
-        props.openNotificationWithIcon(`Starting '${props.accountAction} ${props.objectName}' transaction.`);
+        try {
+          const txn = await props.asyncContractCallback(
+              values.accountAddress
+          );
+          props.openNotificationWithIcon(`Starting '${props.accountAction} ${props.objectName}' transaction.`);
+          await txn.wait();
+          onClose();
+          props.openNotificationWithIcon(`Transaction finished succesfully.`,`Action '${props.accountAction} ${props.objectName}' performed on Account: ${values.accountAddress}`);
 
-        await txn.wait();
-
-        props.openNotificationWithIcon(`Transaction finished succesfully.`);
+        } catch (error) {
+          console.log(error);
+          props.openNotificationWithIcon('Transaction Failed!','Please check the console for error messages', 'error');
+        }
         
         setLoading(false);
-        
-        onClose();
-
-        props.openNotificationWithIcon(`Action '${props.accountAction} ${props.objectName}' performed on Account: ${values.accountAddress}`);
     }
 
     const onFinish = (values) => {

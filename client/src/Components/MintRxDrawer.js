@@ -72,11 +72,11 @@ export const MintRxDrawer = (props) => {
 
     const mintRx = async (values) => {
       /* Here goes the Web3 Contract Call !!! */
-      const keys = [values.key1, values.key2, values.key3, values.key4, values.key5, values.key6, values.key7, values.key8, values.key9, values.key10, values.key11, values.key12 ]
-      const vals = [values.value1, values.value2, values.value3, values.value4, values.value5, values.value6, values.value7, values.value8, values.value9, values.value10, values.value11, values.value12 ]
       setLoading(true);
-
+      
       try{
+        const keys = [values.key1, values.key2, values.key3, values.key4, values.key5, values.key6, values.key7, values.key8, values.key9, values.key10, values.key11, values.key12 ]
+        const vals = [values.value1, values.value2, values.value3, values.value4, values.value5, values.value6, values.value7, values.value8, values.value9, values.value10, values.value11, values.value12 ]
         const txn = await props.contract.mint(
             values.accountAddress,
             keys,
@@ -84,9 +84,8 @@ export const MintRxDrawer = (props) => {
         );
         props.openNotificationWithIcon(`Starting Minting of Prescription`);
         await txn.wait();
-        props.openNotificationWithIcon(`Transaction finished succesfully`,`Prescribed Rx to: ${resultName} (${resultSubjectId})`);
         onClose();
-
+        props.openNotificationWithIcon(`Transaction finished succesfully`,`Prescribed Rx to: ${resultName} (${resultSubjectId})`);
       } catch (error) {
         console.log(error);
         props.openNotificationWithIcon('Prescription of Rx Failed','Please check the console for error messages', 'error');

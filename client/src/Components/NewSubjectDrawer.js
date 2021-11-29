@@ -84,31 +84,30 @@ export const NewSubjectDrawer = (props) => {
         /* Here goes the Web3 Contract Call !!! */
         setLoading(true);
 
-        let birthDateInSeconds = Math.ceil(values.birthDate.valueOf() / 1000);
-        const txn = await props.contract.setSubjectData(
-            values.accountAddress,
-            birthDateInSeconds,
-            values.fullName,
-            values.homeAddress
-        );
-        props.openNotificationWithIcon(`Starting 'Add Patient' transaction.`);
-
-        await txn.wait();
-
-        props.openNotificationWithIcon(`Transaction finished succesfully.`);
-        
-        setLoading(false);
-        
-        let birthDate = new Date(birthDateInSeconds * 1000)
-
-        onClose();
-
-        props.openNotificationWithIcon(`Patient Added: {
+        try {
+          let birthDateInSeconds = Math.ceil(values.birthDate.valueOf() / 1000);
+          const txn = await props.contract.setSubjectData(
+              values.accountAddress,
+              birthDateInSeconds,
+              values.fullName,
+              values.homeAddress
+          );
+          props.openNotificationWithIcon(`Starting 'Add Patient' transaction.`);
+          await txn.wait();
+          // props.openNotificationWithIcon(`Transaction finished succesfully.`);
+          let birthDate = new Date(birthDateInSeconds * 1000)
+          onClose();
+          props.openNotificationWithIcon(`Transaction finished succesfully.`,`Patient Added: {
             Account: ${values.accountAddress},
             Name: ${values.fullName},
-            Date of Birth: ${birthDate},
+            Date of Birth: ${birthDate.toDateString()},
             Home Address: ${values.homeAddress}
-        }`);
+          }`);
+        } catch (error) {
+          console.log(error);
+          props.openNotificationWithIcon('Transaction Failed!','Please check the console for error messages', 'error');
+        }
+        setLoading(false);
     }
 
     const onFinish = (values) => {

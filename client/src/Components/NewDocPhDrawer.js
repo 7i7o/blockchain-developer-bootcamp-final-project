@@ -75,29 +75,27 @@ const NewDocPhDrawer = (props) => {
   const add = async (values) => {
     /* Here goes the Web3 Contract Call !!! */
     setLoading(true);
-
-    console.log("Contract: ", props.contract)
-    const txn = await props.asyncContractCallback(
-      values.accountAddress,
-      values.degree,
-      values.license
-    );
-
-    props.openNotificationWithIcon(`Starting 'Add ${props.objectName}' transaction.`);
-
-    await txn.wait();
-
-    props.openNotificationWithIcon(`Contract called finished succesfully.`);
+    // console.log("Contract: ", props.contract)
     
-    setLoading(false);
-    
-    onClose();
-
-    props.openNotificationWithIcon(`${props.objectName} Added: {
+    try {
+      const txn = await props.asyncContractCallback(
+        values.accountAddress,
+        values.degree,
+        values.license
+      );
+      props.openNotificationWithIcon(`Starting 'Add ${props.objectName}' transaction.`);
+      await txn.wait();
+      onClose();
+      props.openNotificationWithIcon(`Transaction finished succesfully.`,`${props.objectName} Added: {
         Account: ${values.accountAddress},
         Degree: ${values.degree},
         License: ${values.license}
-    }`);
+      }`);
+    } catch (error) {
+      console.log(error);
+      props.openNotificationWithIcon('Transaction Failed!','Please check the console for error messages', 'error');
+    }
+    setLoading(false);
   }
 
   const onFinish = (values) => {
