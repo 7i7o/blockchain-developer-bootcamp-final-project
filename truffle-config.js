@@ -2,6 +2,8 @@ require('dotenv').config();
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const path = require("path");
 
+const INFURA_PROJECT_ID = 'https://rinkeby.infura.io/v3/216ff566890841a191668183133a69e1'
+
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
   // to customize your Truffle configuration!
