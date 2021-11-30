@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Drawer, Form, Button, Input, Space, Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Drawer, Form, Button, Input, Space, Spin, Typography } from 'antd';
 import { MinusCircleTwoTone, PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import UserFullInfo from './UserFullInfo';
@@ -17,6 +17,8 @@ export const AccountActionDrawer = (props) => {
     const [existsSubject, setExistsSubject] = useState(false);
     const [existsDoctor, setExistsDoctor] = useState(false);
     const [existsPharmacist, setExistsPharmacist] = useState(false);
+
+
     
     // const [resultSubjectId, setResultSubjectId] = useState("");
     // const [resultName, setResultName] = useState("");
@@ -25,12 +27,23 @@ export const AccountActionDrawer = (props) => {
 
     const [form] = Form.useForm();
 
+    useEffect( () => {
+      if (visible && props.autoExecute && props.accountAddress) {
+        form.setFieldsValue({"accountAddress": props.accountAddress})
+        handleFormSubmit()
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visible, props.autoExecute, props.accountAddress]);
+
     const showDrawer = () => {
         setVisible(true);
     };
 
     const onClose = () => {
         setVisible(false);
+        if (props.autoExecute) {
+          props.autoRefreshCallback();
+        }
     };
 
     const checkAccount = (_, value) => {
@@ -69,10 +82,12 @@ export const AccountActionDrawer = (props) => {
 
           const txn = await props.asyncContractCallback(params);
 
-          props.openNotificationWithIcon(`Starting '${props.accountAction} ${props.objectName}' transaction.`);
+          props.openNotificationWithIcon(
+            <Typography.Text>Starting '{props.accountAction} {props.objectName}' transaction.</Typography.Text>
+          );
           await txn.wait();
           onClose();
-          props.openNotificationWithIcon(`Transaction finished succesfully.`,`Action '${props.accountAction} ${props.objectName}' performed on Account: ${values.accountAddress}`);
+          props.openNotificationWithIcon(`Transaction finished succesfully.`,`Action '${props.accountAction} ${props.objectName}' performed on Account: ${params}`);
 
         } catch (error) {
           console.log(error);

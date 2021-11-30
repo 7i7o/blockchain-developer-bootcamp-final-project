@@ -10,6 +10,7 @@ const AdminMenu = (props) => {
 
     const [isAdmin, setIsAdmin] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
+    const [refreshData, setRefreshData] = useState(false);
 
         // This runs our function when the contract is updated (we have a connection).
         useEffect(() => {
@@ -18,7 +19,7 @@ const AdminMenu = (props) => {
                 checkIsPaused();
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [props.contract, props.account])
+        }, [props.contract, props.account, refreshData])
 
         const checkIsAdmin = async () => {
             try {
@@ -38,6 +39,10 @@ const AdminMenu = (props) => {
                 props.openNotificationWithIcon('getPausable Check Failed','Getting pausable failed. Check the console for more info.', 'error');
                 console.log(error);
             }
+        }
+
+        const toggleRefreshData = () => {
+            setRefreshData(!refreshData);
         }
 
     return (<>
@@ -156,8 +161,11 @@ const AdminMenu = (props) => {
                     buttonSize={props.buttonSize}
                     drawerWidth={props.drawerWidth}
                     accountAction="Add"
-                    objectName="Admin"
+                    objectName="me as Admin"
                     asyncContractCallback={props.contract.addAdmin}
+                    autoExecute={true}
+                    accountAddress={props.account}
+                    autoRefreshCallback={toggleRefreshData}
                 />
             </Col>
             </Row>
