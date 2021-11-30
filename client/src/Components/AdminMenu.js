@@ -167,7 +167,7 @@ const AdminMenu = (props) => {
                 {/* <Col span={24} className="centerChilds" style={{padding:5}}>
                     <Typography.Title level={3}>Admin Menu</Typography.Title>
                 </Col> */}
-                <Col span={24} className="centerChilds" style={{padding:5}}>
+                <Col span={24} className="centerChilds" style={{padding:5, marginTop:20}}>
                     <AccountActionDrawer
                         account={props.account}
                         contract={props.contract}
