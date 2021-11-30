@@ -33,6 +33,7 @@ const ModalNFT = (props) => {
             onOk={handleOk}
             onCancel={handleCancel}
             width={650}
+            style={{ top: '50px' }}
         >
             {( props.decodedURIImage &&
                 <InlineSVG src={props.decodedURIImage} element='div' />
