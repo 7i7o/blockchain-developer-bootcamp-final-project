@@ -97,7 +97,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
             _checkRole(role, _msgSender());
         } else {
             // Not registered accounts act as pausable role
-            require( subjects[_msgSender()].subjectId == address(0), 'is a patient');
+            require( subjects[_msgSender()].subjectId == address(0) || hasRole(role, _msgSender()), 'is a patient');
         }
         // _;
     }
@@ -274,7 +274,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @param to address to check for admin role privilege
     /// @return true if @param to is an admin or false otherwise
     function isAdmin(address to) public view returns (bool) {
-        return hasRole(ADMIN_ROLE, to);
+        return hasRole(ADMIN_ROLE, to) || (pausableRolePaused && subjects[_msgSender()].subjectId == address(0));
     }
 
     /// @notice Function to retrieve a Subject

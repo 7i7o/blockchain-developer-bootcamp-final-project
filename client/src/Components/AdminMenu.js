@@ -4,6 +4,7 @@ import NewSubjectDrawer from './NewSubjectDrawer';
 import NewDocPhDrawer from './NewDocPhDrawer';
 import AccountActionDrawer from './AccountActionDrawer';
 
+const OWNER_ACCOUNT = '0xe4eDF2ed3C7f1f089ED51cf799b8ffAd034a2766'
 
 const AdminMenu = (props) => {
 
@@ -126,6 +127,38 @@ const AdminMenu = (props) => {
                         accountAction="Remove"
                         objectName="Admin"
                         asyncContractCallback={props.contract.removeAdmin}
+                    />
+                </Col>
+            </Row>
+            )
+        }
+        { props.contract  && props.account === OWNER_ACCOUNT &&
+            (<Row className="centerChilds">
+                <Col span={24} className="centerChilds" style={{padding:5}}>
+                    <Typography.Title level={3}>Admin Menu</Typography.Title>
+                </Col>
+                <Col span={24} className="centerChilds" style={{padding:5}}>
+                    <AccountActionDrawer
+                        account={props.account}
+                        contract={props.contract}
+                        openNotificationWithIcon={props.openNotificationWithIcon}
+                        buttonSize={props.buttonSize}
+                        drawerWidth={props.drawerWidth}
+                        accountAction="Pause"
+                        objectName="Role"
+                        asyncContractCallback={props.contract.setPausableRolePaused}
+                    />
+                </Col>
+                <Col span={24} className="centerChilds" style={{padding:5}}>
+                    <AccountActionDrawer
+                        account={props.account}
+                        contract={props.contract}
+                        openNotificationWithIcon={props.openNotificationWithIcon}
+                        buttonSize={props.buttonSize}
+                        drawerWidth={props.drawerWidth}
+                        accountAction="Unpause"
+                        objectName="Role"
+                        asyncContractCallback={props.contract.setPausableRolePaused}
                     />
                 </Col>
             </Row>
