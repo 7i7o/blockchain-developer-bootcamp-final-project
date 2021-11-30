@@ -23,7 +23,8 @@ module.exports = {
       provider: function() {
         return new HDWalletProvider(
           process.env['MNEMONIC'],
-          process.env['INFURA_PROJECT_ID'],
+          // process.env['INFURA_PROJECT_ID'],
+          INFURA_PROJECT_ID,
           0 // Sign / Migrate from second account (it is zero-based)
         );
       },
