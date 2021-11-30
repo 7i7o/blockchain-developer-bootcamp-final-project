@@ -251,6 +251,12 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
         pausableRolePaused = _paused;
     }
 
+    /// @notice Function to set pausableRolePaused (only deployer of contract is allowed)
+    /// @return bool with state variable
+    function getPausableRolePaused() public view returns (bool) {
+        return pausableRolePaused;
+    }
+
     /// @notice function override to prohibit token transfers
     function _transfer(address from, address to, uint256 tokenId ) internal view override(ERC721) {
         require(msg.sender == address(0), "rxs are untransferable");
@@ -259,14 +265,21 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @notice Function to add an admin account
     /// @param to Address of the account to grant admin role
     function addAdmin(address to) public   {
-        onlyPausableRole(ADMIN_ROLE);
-        grantRole(ADMIN_ROLE, to);
+        // onlyPausableRole(ADMIN_ROLE);
+        if (!pausableRolePaused) {
+            grantRole(ADMIN_ROLE, to);
+        } else {
+            // if ( subjects[_msgSender()].subjectId == address(0) || hasRole(role, _msgSender())) {
+            // We skip role manager checks for the final project presentation
+            _grantRole(ADMIN_ROLE, to);
+            // }
+        }
     }
 
     /// @notice Function to remove an admin account
     /// @param to Address of the account to remove admin role
-    function removeAdmin(address to) public  {
-        onlyPausableRole(ADMIN_ROLE);
+    function removeAdmin(address to) public onlyRole(ADMIN_ROLE) {
+        // onlyPausableRole(ADMIN_ROLE);
         revokeRole(ADMIN_ROLE, to);
     }
 
@@ -274,7 +287,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @param to address to check for admin role privilege
     /// @return true if @param to is an admin or false otherwise
     function isAdmin(address to) public view returns (bool) {
-        return hasRole(ADMIN_ROLE, to) || (pausableRolePaused && subjects[_msgSender()].subjectId == address(0));
+        return hasRole(ADMIN_ROLE, to); // || (pausableRolePaused && subjects[_msgSender()].subjectId == address(0));
     }
 
     /// @notice Function to retrieve a Subject
@@ -316,9 +329,9 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Only ADMIN_ROLE users are allowed to modify subjects
     function setSubjectData(address _subjectId, uint256 _birthDate, string calldata _name, string calldata _homeAddress)
         public
-        
+        onlyRole(ADMIN_ROLE)
         returns (address) {
-            onlyPausableRole(ADMIN_ROLE);
+            // onlyPausableRole(ADMIN_ROLE);
             require (_subjectId != address(0), "0 address");
             // Subject memory newSubject = Subject(_subjectId, _name, _birthDate, _homeAddress);
             // subjects[_subjectId] = newSubject;
@@ -335,10 +348,10 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @return the ethereum address of the doctor that was registered in the contract
     function setDoctorData(address _subjectId, string calldata _degree, string calldata _license) //, address[] calldata _workplaces)
         public
-        
+        onlyRole(ADMIN_ROLE)
         isSubject(_subjectId)
         returns (address) {
-            onlyPausableRole(ADMIN_ROLE);
+            // onlyPausableRole(ADMIN_ROLE);
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isSubject()
             // Doctor memory newDoctor = Doctor(_subjectId, _degree, _license);
             // doctors[_subjectId] = newDoctor;
@@ -358,10 +371,10 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @return the ethereum address of the pharmacist that was registered in the contract
     function setPharmacistData(address _subjectId, string calldata _degree, string calldata _license) //, address[] calldata _workplaces)
         public
-        
+        onlyRole(ADMIN_ROLE)
         isSubject(_subjectId)
         returns (address) {
-            onlyPausableRole(ADMIN_ROLE);
+            // onlyPausableRole(ADMIN_ROLE);
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isSubject()
             // Pharmacist memory newPharmacist = Pharmacist(_subjectId, _degree, _license);
             // pharmacists[_subjectId] = newPharmacist;
@@ -378,11 +391,11 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Only ADMIN_ROLE users are allowed to remove subjects
     function removeSubject(address _subjectId)
         public
-        
+        onlyRole(ADMIN_ROLE)
         isSubject(_subjectId)
         isNotDoctor(_subjectId)
         isNotPharmacist(_subjectId) {
-            onlyPausableRole(ADMIN_ROLE);// require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isSubject()
+            // onlyPausableRole(ADMIN_ROLE);// require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isSubject()
             delete subjects[_subjectId];
             emit subjectRemoved(msg.sender, _subjectId);
     }
@@ -392,9 +405,9 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Only ADMIN_ROLE users are allowed to remove doctors
     function removeDoctor(address _subjectId)
         public
-        
+        onlyRole(ADMIN_ROLE)
         isDoctor(_subjectId) {
-            onlyPausableRole(ADMIN_ROLE);
+            // onlyPausableRole(ADMIN_ROLE);
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isDoctor()
             revokeRole(MINTER_ROLE, _subjectId);
             delete doctors[_subjectId];
@@ -406,9 +419,9 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Only ADMIN_ROLE users are allowed to remove pharmacists
     function removePharmacist(address _subjectId)
         public
-        
+        onlyRole(ADMIN_ROLE)
         isPharmacist(_subjectId) {
-            onlyPausableRole(ADMIN_ROLE);
+            
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isPharmacist()
             revokeRole(BURNER_ROLE, _subjectId);
             delete pharmacists[_subjectId];

@@ -19,6 +19,7 @@ import Rx from "../contracts/Rx.json";
 // const CONTRACT_ADDRESS = '0x995c9446cEC8b39b16b10C8cbD4f99C7BD0c488C' // v2 on Rinkeby
 // const CONTRACT_ADDRESS = '0x9C93012205267eaa97b352ab1add200C0DEF5282' // v3 on Rinkeby
 // const CONTRACT_ADDRESS = '0x33ea420C549a71079C7e16A541aB788f9297B681' // v4 on Rinkeby
+// const CONTRACT_ADDRESS = '0x9575E9BC8f62Be8C9a43494B85ac58407249D329' // v5 on Rinkeby
 
 const ConnectWallet = (props) => {
 

@@ -55,6 +55,7 @@ const Landing = (props) => {
                 openNotificationWithIcon={props.openNotificationWithIcon}
                 drawerWidth={DRAWER_WIDTH}
                 buttonSize={BUTTON_SIZE}
+                existsSubject={existsSubject}
                 />)
         }
         { props.contract &&

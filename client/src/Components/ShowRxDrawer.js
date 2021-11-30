@@ -38,6 +38,24 @@ const ShowRxDrawer = (props) => {
                     // rxData={rxData}
                     // rxTokenURI={rxTokenURI}
                 />
+                {/* { props.parentObjectName === "Patient" && 
+                    <ApprovePharmacist 
+                        account={props.account}
+                        contract={props.contract}
+                        openNotificationWithIcon={props.openNotificationWithIcon}
+                        tokenId={props.tokenId}
+                        parentObjectName={props.parentObjectName}
+                    />
+                } */}
+                {/* { props.parentObjectName === "Pharmacist" && 
+                    <PharmacistBurnAction 
+                        account={props.account}
+                        contract={props.contract}
+                        openNotificationWithIcon={props.openNotificationWithIcon}
+                        tokenId={props.tokenId}
+                        parentObjectName={props.parentObjectName}
+                    />
+                } */}
             </Drawer>
         </>
     );
