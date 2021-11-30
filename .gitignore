@@ -12,7 +12,7 @@ artifacts
 #React files
 client/node_modules
 client/src/contracts/v*
-client/src/contracts
+#client/src/contracts
 .unusedFiles
 
 # dependencies

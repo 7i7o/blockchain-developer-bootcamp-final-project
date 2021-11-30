@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.0; // Modified for and updated pragma solidity declaration
+pragma solidity 0.8.9; // Modified for and updated pragma solidity declaration
 // pragma solidity ^0.4.16;
 
 import '@openzeppelin/contracts/utils/Strings.sol';

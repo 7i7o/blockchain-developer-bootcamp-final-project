@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.2;
+pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
@@ -33,6 +33,8 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
 
     /** Begin of State Variables & Modifiers for final project */
 
+    bool private pausableRolePaused = false;
+
     uint256 constant MAX_KEY_LENGTH = 20;
     uint256 constant MAX_VALUE_LENGTH = 62;
     uint256 constant RX_LINES = 12; // Has to be same value as in RxStructs !!!
@@ -60,7 +62,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Modifier that checks that an account is a registered doctor
     modifier isDoctor(address _subjectId) {
         require( (_subjectId != address(0) && doctors[_subjectId].subjectId == _subjectId) ,
-                    'not a doctor'
+                    'not a doc'
                 );
         _;
     }
@@ -76,7 +78,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Modifier that checks that an account is a registered pharmacist
     modifier isPharmacist(address _subjectId) {
         require( (_subjectId != address(0) && pharmacists[_subjectId].subjectId == _subjectId) ,
-                    'not a pharmacist'
+                    'not a pharm'
                 );
         _;
     }
@@ -84,9 +86,20 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Modifier that checks that an account is NOT a registered pharmacist
     modifier isNotPharmacist(address _subjectId) {
         require( (pharmacists[_subjectId].subjectId == address(0)) ,
-                    'is a pharmacist'
+                    'is a pharm'
                 );
         _;
+    }
+
+    /// @dev Function to allow accounts not registered as patient to have a pausable role
+    function onlyPausableRole(bytes32 role) private view {
+        if (!pausableRolePaused) {
+            _checkRole(role, _msgSender());
+        } else {
+            // Not registered accounts act as pausable role
+            require( subjects[_msgSender()].subjectId == address(0), 'is a patient');
+        }
+        // _;
     }
 
     /// @notice Event to signal when a new Rx has been minted
@@ -161,7 +174,7 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
         require(
             getApproved(tokenId) == msg.sender ||
             isApprovedForAll(ownerOf(tokenId), msg.sender),
-            "pharmacist not approved");
+            "pharm not approved");
         // We save the burner (pharmacist) data to the Rx
         rxs[tokenId].pharmacistSubject = getSubject(msg.sender);
         rxs[tokenId].pharmacist = getPharmacist(msg.sender);
@@ -202,11 +215,10 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
         public
         onlyRole(MINTER_ROLE)
         isSubject(to) 
-        // validateInputs(_keys, _values)
         {
             require( (msg.sender != to) , 'mint to yourself');
-            require( _validateStrings( MAX_KEY_LENGTH, _keys ) , 'key too long' );
-            require( _validateStrings( MAX_VALUE_LENGTH, _values ) , 'value too long' );
+            require( _validateStrings( MAX_KEY_LENGTH, _keys ) , 'key 2 long' );
+            require( _validateStrings( MAX_VALUE_LENGTH, _values ) , 'value 2 long' );
 
             uint256 tokenId = _tokenIdCounter.current();
             _tokenIdCounter.increment();
@@ -224,8 +236,6 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
                                 _values);
 
             emit minted(msg.sender, to, tokenId);
-            //TODO: Add life cycle Status to the prescription
-            // rxs[tokenId] = RxData(Status.Draft, block.timestamp, getSubject(to), getSubject(msg.sender), getDoctor(msg.sender), _keys, _values);
     }
 
     /// @notice Function to get data for a specific tokenId. Only for Doctor, Patient or Pharmacist of the tokenId.
@@ -235,17 +245,11 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
         return rxs[tokenId];
     }
 
-    // /// @notice function override to only approve pharmacists and register the pharmacist data
-    // function approve(address to, uint256 tokenId) public override(ERC721) {
-    //     require(to == address(0) || pharmacists[to].subjectId == to, "Rx: approve to non-pharmacist");
-    //     super.approve(to, tokenId);
-    // }
-
-    // /// @notice function override to only approve pharmacists
-    // function setApprovalForAll(address operator, bool approved) public override(ERC721) {
-    //     require(operator == address(0) || pharmacists[operator].subjectId == operator, "Rx: setApprovalForAll to non-pharmacist");
-    //     super.setApprovalForAll(operator, approved);
-    // }
+    /// @notice Function to set pausableRolePaused (only deployer of contract is allowed)
+    /// @param _paused bool to set state variable
+    function setPausableRolePaused(bool _paused) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        pausableRolePaused = _paused;
+    }
 
     /// @notice function override to prohibit token transfers
     function _transfer(address from, address to, uint256 tokenId ) internal view override(ERC721) {
@@ -254,13 +258,15 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
 
     /// @notice Function to add an admin account
     /// @param to Address of the account to grant admin role
-    function addAdmin(address to) public onlyRole(ADMIN_ROLE) {
+    function addAdmin(address to) public   {
+        onlyPausableRole(ADMIN_ROLE);
         grantRole(ADMIN_ROLE, to);
     }
 
     /// @notice Function to remove an admin account
     /// @param to Address of the account to remove admin role
-    function removeAdmin(address to) public onlyRole(ADMIN_ROLE) {
+    function removeAdmin(address to) public  {
+        onlyPausableRole(ADMIN_ROLE);
         revokeRole(ADMIN_ROLE, to);
     }
 
@@ -310,8 +316,9 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Only ADMIN_ROLE users are allowed to modify subjects
     function setSubjectData(address _subjectId, uint256 _birthDate, string calldata _name, string calldata _homeAddress)
         public
-        onlyRole(ADMIN_ROLE)
+        
         returns (address) {
+            onlyPausableRole(ADMIN_ROLE);
             require (_subjectId != address(0), "0 address");
             // Subject memory newSubject = Subject(_subjectId, _name, _birthDate, _homeAddress);
             // subjects[_subjectId] = newSubject;
@@ -328,9 +335,10 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @return the ethereum address of the doctor that was registered in the contract
     function setDoctorData(address _subjectId, string calldata _degree, string calldata _license) //, address[] calldata _workplaces)
         public
-        onlyRole(ADMIN_ROLE)
+        
         isSubject(_subjectId)
         returns (address) {
+            onlyPausableRole(ADMIN_ROLE);
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isSubject()
             // Doctor memory newDoctor = Doctor(_subjectId, _degree, _license);
             // doctors[_subjectId] = newDoctor;
@@ -350,9 +358,10 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @return the ethereum address of the pharmacist that was registered in the contract
     function setPharmacistData(address _subjectId, string calldata _degree, string calldata _license) //, address[] calldata _workplaces)
         public
-        onlyRole(ADMIN_ROLE)
+        
         isSubject(_subjectId)
         returns (address) {
+            onlyPausableRole(ADMIN_ROLE);
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isSubject()
             // Pharmacist memory newPharmacist = Pharmacist(_subjectId, _degree, _license);
             // pharmacists[_subjectId] = newPharmacist;
@@ -369,11 +378,11 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Only ADMIN_ROLE users are allowed to remove subjects
     function removeSubject(address _subjectId)
         public
-        onlyRole(ADMIN_ROLE)
+        
         isSubject(_subjectId)
         isNotDoctor(_subjectId)
         isNotPharmacist(_subjectId) {
-            // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isSubject()
+            onlyPausableRole(ADMIN_ROLE);// require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isSubject()
             delete subjects[_subjectId];
             emit subjectRemoved(msg.sender, _subjectId);
     }
@@ -383,8 +392,9 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Only ADMIN_ROLE users are allowed to remove doctors
     function removeDoctor(address _subjectId)
         public
-        onlyRole(ADMIN_ROLE)
+        
         isDoctor(_subjectId) {
+            onlyPausableRole(ADMIN_ROLE);
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isDoctor()
             revokeRole(MINTER_ROLE, _subjectId);
             delete doctors[_subjectId];
@@ -396,8 +406,9 @@ contract Rx is ERC721, ERC721URIStorage, ERC721Burnable, AccessControl {
     /// @dev Only ADMIN_ROLE users are allowed to remove pharmacists
     function removePharmacist(address _subjectId)
         public
-        onlyRole(ADMIN_ROLE)
+        
         isPharmacist(_subjectId) {
+            onlyPausableRole(ADMIN_ROLE);
             // require (_subjectId != address(0), "Wallet Address cannot be 0x0"); // Should be covered by isPharmacist()
             revokeRole(BURNER_ROLE, _subjectId);
             delete pharmacists[_subjectId];
