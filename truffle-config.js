@@ -22,7 +22,7 @@ module.exports = {
         return new HDWalletProvider(
           process.env['MNEMONIC'],
           process.env['INFURA_PROJECT_ID'],
-          1 // Sign / Migrate from second account (it is zero-based)
+          0 // Sign / Migrate from second account (it is zero-based)
         );
       },
       network_id: 4, // Rinkeby Network Id

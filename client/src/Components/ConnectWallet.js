@@ -148,7 +148,7 @@ const ConnectWallet = (props) => {
                         {/* <Typography.Text strong>Rx only works on </Typography.Text>
                         <Typography.Link href="https://faucet.rinkeby.io/" target="_blank">Rinkeby</Typography.Link>
                         <Typography.Text strong>. Please change your network.</Typography.Text> */}
-                        <Typography.Text strong>Rx only works on ${NETWORK_DESC}. Please change your network.</Typography.Text>
+                        <Typography.Text strong>Rx only works on {NETWORK_DESC}. Please change your network.</Typography.Text>
                     </div>
                   )}
                   { props.connection && props.rightNetwork && !loggedIn && (
