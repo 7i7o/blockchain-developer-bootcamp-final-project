@@ -10,12 +10,12 @@ module.exports = {
     develop: {
       host: "localhost",
       port: 8545,
-      network_id: "*",
+      network_id: 1337,
     },
     development: {
       host: "localhost",
       port: 8545,
-      network_id: "*",
+      network_id: 1337,
     },
     rinkeby:{
       provider: function() {
