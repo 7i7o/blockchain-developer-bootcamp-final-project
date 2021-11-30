@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { Button, Typography, Row, Col, Space } from 'antd';
+import { NETWORK_ID, NETWORK_DESC } from './utils/constants';
 
 import Rx from "../contracts/Rx.json";
 
@@ -16,8 +17,7 @@ import Rx from "../contracts/Rx.json";
 
 // const CONTRACT_ADDRESS = '0x668931aE15C2062BC5002306E1FeED42abdcEf8F' // v1 on Rinkeby
 // const CONTRACT_ADDRESS = '0x995c9446cEC8b39b16b10C8cbD4f99C7BD0c488C' // v2 on Rinkeby
-
-const NETWORK_ID = 4; // Rinkeby
+// const CONTRACT_ADDRESS = '0x9C93012205267eaa97b352ab1add200C0DEF5282' // v3 on Rinkeby
 
 const ConnectWallet = (props) => {
 
@@ -38,7 +38,7 @@ const ConnectWallet = (props) => {
     async function getWeb3Modal() {
       // let Torus = (await import('@toruslabs/torus-embed')).default
       const web3Modal = new Web3Modal({
-        network: 'rinkeby',
+        network: NETWORK_ID,
         cacheProvider: false,
         providerOptions: {
           walletconnect: {
@@ -148,7 +148,7 @@ const ConnectWallet = (props) => {
                         {/* <Typography.Text strong>Rx only works on </Typography.Text>
                         <Typography.Link href="https://faucet.rinkeby.io/" target="_blank">Rinkeby</Typography.Link>
                         <Typography.Text strong>. Please change your network.</Typography.Text> */}
-                        <Typography.Text strong>Rx only works on Rinkeby. Please change your network.</Typography.Text>
+                        <Typography.Text strong>Rx only works on ${NETWORK_DESC}. Please change your network.</Typography.Text>
                     </div>
                   )}
                   { props.connection && props.rightNetwork && !loggedIn && (
