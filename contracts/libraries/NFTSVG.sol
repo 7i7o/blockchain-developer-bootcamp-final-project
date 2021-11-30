@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.2;
+pragma solidity 0.8.9;
 
 import '@openzeppelin/contracts/utils/Strings.sol';
 import { DateTime } from "./DateTime.sol";
