@@ -62,15 +62,13 @@ export const AccountActionDrawer = (props) => {
         setLoading(true);
 
         try {
-          if (props.objectName === "Role") {
-            const txn = await props.asyncContractCallback(
-              (props.accountAction === "Pause")
-            );
-          } else {  
-            const txn = await props.asyncContractCallback(
-                values.accountAddress
-            );
-          }
+          const params = 
+            (props.objectName === "Role") ? 
+                (props.accountAction === "Pause")
+              : values.accountAddress ;
+
+          const txn = await props.asyncContractCallback(params);
+
           props.openNotificationWithIcon(`Starting '${props.accountAction} ${props.objectName}' transaction.`);
           await txn.wait();
           onClose();
