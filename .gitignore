@@ -7,7 +7,7 @@ typechain
 #Truffle files
 cache
 artifacts
-#truffle-config.js
+truffle-config.js
 
 #React files
 client/node_modules

@@ -25,7 +25,7 @@ module.exports = {
           process.env['MNEMONIC'],
           // process.env['INFURA_PROJECT_ID'],
           INFURA_PROJECT_ID,
-          0 // Sign / Migrate from second account (it is zero-based)
+          0 // Sign / Migrate from first account (it is zero-based)
         );
       },
       network_id: 4, // Rinkeby Network Id
@@ -45,5 +45,8 @@ module.exports = {
       }
     }
   },
-  plugins: ["truffle-contract-size"]
+  plugins: ["truffle-contract-size", "truffle-plugin-verify"],
+  api_keys: {
+    etherscan: process.env['ETHERSCAN_API_KEY']
+  }
 };
