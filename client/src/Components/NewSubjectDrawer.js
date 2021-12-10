@@ -4,6 +4,7 @@ import { PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import moment from 'moment';
 import UserFullInfo from './UserFullInfo';
+import { xml1EncodeString } from './utils/stringSanitizer';
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -86,11 +87,14 @@ export const NewSubjectDrawer = (props) => {
 
         try {
           let birthDateInSeconds = Math.ceil(values.birthDate.valueOf() / 1000);
+          let sanitizedName = xml1EncodeString(values.fullName);
+          let sanitizedHomeAddress = xml1EncodeString(values.homeAddress);
+          
           const txn = await props.contract.setSubjectData(
               values.accountAddress,
               birthDateInSeconds,
-              values.fullName,
-              values.homeAddress
+              sanitizedName,
+              sanitizedHomeAddress
           );
           props.openNotificationWithIcon(`Starting 'Add Patient' transaction.`);
           await txn.wait();

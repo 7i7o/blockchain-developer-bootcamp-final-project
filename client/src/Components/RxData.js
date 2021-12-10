@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Spin, Typography } from 'antd';
 import ModalNFT from './ModalNFT';
+import { xml1DecodeString } from './utils/stringSanitizer';
 
 const RxData = (props) => {
 
@@ -45,6 +46,7 @@ const RxData = (props) => {
             setValues(rxData[7]);
             setBirthDate(new Date(rxData.patient.birthDate.toNumber() * 1000));
             setRxDate(new Date(rxData.date.toNumber() * 1000));
+            // Set Pharmacist Data
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [rxData]);
@@ -97,16 +99,17 @@ const RxData = (props) => {
             headStyle={ headStyle }
             bodyStyle={ bodyStyle }
             >
+                    {/* We have to decode all xml 1.0 encoded symbols on strings */}
                     { patient && birthDate &&
                         <Row>
                             <Col span={6} style={ keyStyle }>Name:</Col>
-                            <Col span={18} style={ valueStyle }>{patient.name}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(patient.name)}</Col>
 
                             <Col span={6} style={ keyStyle }>Date of Birth:</Col>
                             <Col span={18} style={ valueStyle }>{birthDate.toDateString()}</Col>
 
                             <Col span={6} style={ keyStyle }>Address:</Col> 
-                            <Col span={18} style={ valueStyle }>{patient.homeAddress}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(patient.homeAddress)}</Col>
 
                             <Col span={6} style={ keyStyle }>Patient Account:</Col>
                             <Col span={18} style={ valueStyle }>{patient.subjectId}</Col>
@@ -119,30 +122,30 @@ const RxData = (props) => {
                     </Row>
                     { keys && values &&
                         <Row >
-                            <Col span={6} style={ keyStyle }>{keys[0]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[0]}</Col>
-                            <Col span={6} style={ keyStyle }>{keys[1]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[1]}</Col>
-                            <Col span={6} style={ keyStyle }>{keys[2]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[2]}</Col>
-                            <Col span={6} style={ keyStyle }>{keys[3]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[3]}</Col>
-                            <Col span={6} style={ keyStyle }>{keys[4]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[4]}</Col>
-                            <Col span={6} style={ keyStyle }>{keys[5]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[5]}</Col>
-                            <Col span={6} style={ keyStyle }>{keys[6]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[6]}</Col>
-                            <Col span={6} style={ keyStyle }>{keys[7]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[7]}</Col>
-                            <Col span={6} style={ keyStyle }>{keys[8]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[8]}</Col>
-                            <Col span={6} style={ keyStyle }>{keys[9]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[9]}</Col>
-                            <Col span={6} style={ keyStyle }>{keys[10]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[10]}</Col>
-                            <Col span={6} style={ keyStyle }>{keys[11]}</Col>
-                            <Col span={18} style={ valueStyle }>{values[11]}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[0])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[0])}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[1])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[1])}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[2])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[2])}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[3])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[3])}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[4])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[4])}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[5])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[5])}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[6])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[6])}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[7])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[7])}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[8])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[8])}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[9])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[9])}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[10])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[10])}</Col>
+                            <Col span={6} style={ keyStyle }>{xml1DecodeString(keys[11])}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(values[11])}</Col>
                         </Row>
                     }
                     { rxDate && doctorSubject && doctor &&
@@ -151,13 +154,13 @@ const RxData = (props) => {
                             <Col span={18} style={ valueStyle }>{rxDate.toDateString()}</Col>
 
                             <Col span={6} style={ keyStyle }>Doctor Name:</Col>
-                            <Col span={18} style={ valueStyle }>{doctorSubject.name}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(doctorSubject.name)}</Col>
 
                             <Col span={6} style={ keyStyle }>Degree:</Col>
-                            <Col span={18} style={ valueStyle }>{doctor.degree}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(doctor.degree)}</Col>
 
                             <Col span={6} style={ keyStyle }>License:</Col>
-                            <Col span={18} style={ valueStyle }>{doctor.license}</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(doctor.license)}</Col>
 
                             <Col span={6} style={ keyStyle }>Doctor Account:</Col>
                             <Col span={18} style={ valueStyle }>{doctor.subjectId}</Col>

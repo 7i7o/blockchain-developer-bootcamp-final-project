@@ -98,12 +98,14 @@ export const ListRxDrawer = (props) => {
           result = await props.contract.queryFilter(logFilter);
         } catch (error) { console.log(error); setLoading(false); }
         setLoading(false);
-        console.log(result)
+        // console.log(result)
         if (result) {
+          const allResults = result.map(decodeCallback);
+          const noDuplicatesResult = [...new Set(allResults)];
           if (filterCallback !== null) {
-            setRxList((result.map(decodeCallback)).filter(filterCallback))
+            setRxList(noDuplicatesResult.filter(filterCallback))
           } else {
-            setRxList(result.map(decodeCallback))
+            setRxList(noDuplicatesResult)
           }
         } else {
           setRxList([])

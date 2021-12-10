@@ -3,6 +3,7 @@ import { Drawer, Form, Button, Input, Space, Spin } from 'antd';
 import { PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import UserFullInfo from './UserFullInfo';
+import { xml1EncodeString } from './utils/stringSanitizer';
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -78,10 +79,12 @@ const NewDocPhDrawer = (props) => {
     // console.log("Contract: ", props.contract)
     
     try {
+      let sanitizedDegree = xml1EncodeString(values.degree);
+      let sanitizedLicense = xml1EncodeString(values.license);
       const txn = await props.asyncContractCallback(
         values.accountAddress,
-        values.degree,
-        values.license
+        sanitizedDegree,
+        sanitizedLicense
       );
       props.openNotificationWithIcon(`Starting 'Add ${props.objectName}' transaction.`);
       await txn.wait();

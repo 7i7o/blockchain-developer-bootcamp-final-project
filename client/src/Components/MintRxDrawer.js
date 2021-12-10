@@ -4,6 +4,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import SubjectData from './SubjectData';
 import DocPhData from './DocPhData';
+import { xml1EncodeString } from './utils/stringSanitizer';
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const MAX_KEY_LENGTH = 19
@@ -53,6 +54,24 @@ export const MintRxDrawer = (props) => {
         return Promise.reject(new Error('Account must be a valid Ethereum Address!'));
     }
 
+    const checkKeyLength = (_, value) => {
+      if (value) {
+        if (xml1EncodeString(value).length > MAX_KEY_LENGTH) {
+          return Promise.reject(new Error('Text too long!'));
+        }
+      }
+      return Promise.resolve();
+    }
+
+    const checkValueLength = (_, value) => {
+      if (value) {
+        if (xml1EncodeString(value).length > MAX_VALUE_LENGTH) {
+          return Promise.reject(new Error('Text too long!'));
+        }
+      }
+      return Promise.resolve();
+    }
+
     const getSubjectInfo = () => {
         let subjectId = form.getFieldValue("accountAddress");
         if (ethers.utils.isAddress(subjectId)) {
@@ -75,8 +94,8 @@ export const MintRxDrawer = (props) => {
       setLoading(true);
       
       try{
-        const keys = [values.key1, values.key2, values.key3, values.key4, values.key5, values.key6, values.key7, values.key8, values.key9, values.key10, values.key11, values.key12 ]
-        const vals = [values.value1, values.value2, values.value3, values.value4, values.value5, values.value6, values.value7, values.value8, values.value9, values.value10, values.value11, values.value12 ]
+        const keys = [values.key1, values.key2, values.key3, values.key4, values.key5, values.key6, values.key7, values.key8, values.key9, values.key10, values.key11, values.key12 ].map(xml1EncodeString)
+        const vals = [values.value1, values.value2, values.value3, values.value4, values.value5, values.value6, values.value7, values.value8, values.value9, values.value10, values.value11, values.value12 ].map(xml1EncodeString)
         const txn = await props.contract.mint(
             values.accountAddress,
             keys,
@@ -193,54 +212,54 @@ export const MintRxDrawer = (props) => {
             </Row>
 
             <Row>
-              <Col span={6}><Form.Item name='key1' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} maxLength={MAX_KEY_LENGTH} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value1' style={{ marginBottom: 8, fontWeight: 'bold' }}><Input disabled={!validAccount || loading} maxLength={MAX_VALUE_LENGTH} /></Form.Item></Col>
+              <Col span={6}> <Form.Item name='key1'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} maxLength={MAX_KEY_LENGTH} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value1' rules={[{ validator: checkValueLength, }]} style={{ marginBottom: 8, fontWeight: 'bold' }}><Input disabled={!validAccount || loading} maxLength={MAX_VALUE_LENGTH} /></Form.Item></Col>
             </Row>
             <Row>
-              <Col span={6}><Form.Item name='key2' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value2' style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={6}> <Form.Item name='key2'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value2' rules={[{ validator: checkValueLength, }]} style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
             </Row>
             <Row>
-              <Col span={6}><Form.Item name='key3' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value3' style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={6}> <Form.Item name='key3'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value3' rules={[{ validator: checkValueLength, }]} style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
             </Row>
             <Row>
-              <Col span={6}><Form.Item name='key4' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value4' style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
-            </Row>
-
-            <Row>
-              <Col span={6}><Form.Item name='key5' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value5' style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
-            </Row>
-            <Row>
-              <Col span={6}><Form.Item name='key6' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value6' style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
-            </Row>
-            <Row>
-              <Col span={6}><Form.Item name='key7' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value7' style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
-            </Row>
-            <Row>
-              <Col span={6}><Form.Item name='key8' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value8' style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={6}> <Form.Item name='key4'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value4' rules={[{ validator: checkValueLength, }]} style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
             </Row>
 
             <Row>
-              <Col span={6}><Form.Item name='key9' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value9' style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={6}> <Form.Item name='key5'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value5' rules={[{ validator: checkValueLength, }]} tyle={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
             </Row>
             <Row>
-              <Col span={6}><Form.Item name='key10' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value10' style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={6}> <Form.Item name='key6'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value6' rules={[{ validator: checkValueLength, }]} style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
             </Row>
             <Row>
-              <Col span={6}><Form.Item name='key11' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value11' style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={6}> <Form.Item name='key7'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value7' rules={[{ validator: checkValueLength, }]} style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
             </Row>
             <Row>
-              <Col span={6}><Form.Item name='key12' style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
-              <Col span={18}><Form.Item name='value12' style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={6}> <Form.Item name='key8'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value8' rules={[{ validator: checkValueLength, }]} style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
+            </Row>
+
+            <Row>
+              <Col span={6}> <Form.Item name='key9'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value9' rules={[{ validator: checkValueLength, }]} style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
+            </Row>
+            <Row>
+              <Col span={6}> <Form.Item name='key10'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value10' rules={[{ validator: checkValueLength, }]} style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
+            </Row>
+            <Row>
+              <Col span={6}> <Form.Item name='key11'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value11' rules={[{ validator: checkValueLength, }]} style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
+            </Row>
+            <Row>
+              <Col span={6}> <Form.Item name='key12'   rules={[{ validator: checkKeyLength, }]}   style={{ marginBottom: 8 }}><Input className="rAlign" disabled={!validAccount || loading} /></Form.Item></Col>
+              <Col span={18}><Form.Item name='value12' rules={[{ validator: checkValueLength, }]} style={{ marginBottom: 8 }}><Input disabled={!validAccount || loading} /></Form.Item></Col>
             </Row>
 
           </Form>
