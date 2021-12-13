@@ -178,7 +178,20 @@ export const AccountActionDrawer = (props) => {
             <Spin spinning={loading}>
                 <Space>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleFormSubmit} type="primary" disabled={!validAccount || loading} >
+                <Button
+                  onClick={handleFormSubmit}
+                  type="primary"
+                  disabled={
+                    loading 
+                    || !validAccount
+                    // || (props.accountAction === 'Remove' &&
+                    //     ( (props.objectName === 'Pharmacist' && !existsPharmacist)
+                    //     ||(props.objectName === 'Doctor' && !existsDoctor)
+                    //     ||(props.objectName === 'Patient' && (existsPharmacist || existsDoctor || !existsSubject) )
+                    //     )
+                    // )
+                  }
+                >
                   {props.accountAction}
                 </Button>
                 </Space>

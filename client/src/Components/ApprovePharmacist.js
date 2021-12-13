@@ -53,7 +53,7 @@ const ApprovePharmacist = (props) => {
             } catch (error) { console.log(error); setLoading(false); }
             
             if (result) {
-                console.log("Approved Pharmacist: ", result);
+                // console.log("Approved Pharmacist: ", result);
                 setApprovedPharmacist(result);
             } else {
                 setApprovedPharmacist(ZERO_ADDRESS);
@@ -182,7 +182,11 @@ const ApprovePharmacist = (props) => {
                                     <Button
                                         onClick={handleFormSubmit}
                                         type="primary"
-                                        disabled={!existsPharmacist || loading}
+                                        disabled={
+                                            !existsPharmacist
+                                            || loading
+                                            || searchableSubjectId === approvedPharmacist
+                                        }
                                     >
                                         Assign Pharmacist
                                     </Button>

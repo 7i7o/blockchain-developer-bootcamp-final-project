@@ -157,8 +157,14 @@ export const MintRxDrawer = (props) => {
             <Spin spinning={loading}>
                 <Space>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleFormSubmit} type="primary" disabled={loading} >
-                    Prescribe
+                <Button
+                  onClick={handleFormSubmit}
+                  type="primary"
+                  disabled={loading
+                    || !validAccount
+                    || props.account === searchableSubjectId }
+                >
+                  Prescribe
                 </Button>
                 </Space>
             </Spin>

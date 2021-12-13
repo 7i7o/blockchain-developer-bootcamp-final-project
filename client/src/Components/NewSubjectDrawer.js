@@ -158,8 +158,12 @@ export const NewSubjectDrawer = (props) => {
             <Spin spinning={loading}>
                 <Space>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleFormSubmit} type="primary" disabled={loading} >
-                    Save
+                <Button
+                  onClick={handleFormSubmit}
+                  type="primary"
+                  disabled={loading || !validAccount}
+                >
+                  Save
                 </Button>
                 </Space>
             </Spin>

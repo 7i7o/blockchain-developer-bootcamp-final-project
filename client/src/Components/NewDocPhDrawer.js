@@ -146,7 +146,11 @@ const NewDocPhDrawer = (props) => {
             <Spin spinning={loading}>
               <Space>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleFormSubmit} type="primary">
+                <Button
+                  onClick={handleFormSubmit}
+                  type="primary"
+                  disabled={ loading || !validAccount || !existsSubject }
+                >
                   Save
                 </Button>
               </Space>
