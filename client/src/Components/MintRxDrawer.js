@@ -5,10 +5,11 @@ import { ethers } from 'ethers';
 import SubjectData from './SubjectData';
 import DocPhData from './DocPhData';
 import { xml1EncodeString } from './utils/stringSanitizer';
+import { MAX_KEY_LENGTH, MAX_VALUE_LENGTH, ZERO_ADDRESS } from './utils/constants';
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-const MAX_KEY_LENGTH = 19
-const MAX_VALUE_LENGTH = 61
+// const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+// const MAX_KEY_LENGTH = 19
+// const MAX_VALUE_LENGTH = 61
 
 
 export const MintRxDrawer = (props) => {

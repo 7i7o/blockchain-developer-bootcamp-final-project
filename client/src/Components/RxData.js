@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Spin, Typography } from 'antd';
 import ModalNFT from './ModalNFT';
 import { xml1DecodeString } from './utils/stringSanitizer';
+import ApprovePharmacist from './ApprovePharmacist';
 
 const RxData = (props) => {
 
@@ -14,6 +15,8 @@ const RxData = (props) => {
     const [patient, setPatient] = useState(null);
     const [doctorSubject, setDoctorSubject] = useState(null);
     const [doctor, setDoctor] = useState(null);
+    const [pharmacistSubject, setPharmacistSubject] = useState(null);
+    const [pharmacist, setPharmacist] = useState(null);
     const [keys, setKeys] = useState(null);
     const [values, setValues] = useState(null);
     const [birthDate, setBirthDate] = useState(null);
@@ -42,6 +45,8 @@ const RxData = (props) => {
             setPatient(rxData.patient);
             setDoctorSubject(rxData.doctorSubject);
             setDoctor(rxData.doctor);
+            setPharmacist(rxData.pharmacist);
+            setPharmacistSubject(rxData.pharmacistSubject);
             setKeys(rxData[6]);
             setValues(rxData[7]);
             setBirthDate(new Date(rxData.patient.birthDate.toNumber() * 1000));
@@ -66,7 +71,7 @@ const RxData = (props) => {
             result = await asyncCallback(tokenId);
         } catch (error) { console.log(error); setLoading(false); }
         if (result) {
-            console.log(result);
+            // console.log(result);
             setCallback(result);
         } else {
             setRxData(null);
@@ -90,8 +95,17 @@ const RxData = (props) => {
         // paddingTop: 1,
     }
 
-    return (<>
+    return (
         <Spin spinning={loading}>
+        { rxData && rxTokenURI &&
+            <ModalNFT
+                tokenId={props.tokenId}
+                rxData={rxData}
+                rxTokenURI={rxTokenURI}
+                decodedURIImage={decodedURIImage}
+                closable
+            />
+        }
         { rxData &&
             <Card
             className='cAlign'
@@ -116,8 +130,8 @@ const RxData = (props) => {
                         </Row>
                     }
                     <Row>
-                        <Col span={3} style={{ paddingTop: 30}}>
-                            <Typography.Title level={3}>RX</Typography.Title>
+                        <Col span={24} style={{ paddingTop: 30}}>
+                            <Typography.Title level={3} style= {{ textAlign: 'left' }}>RX</Typography.Title>
                         </Col>
                     </Row>
                     { keys && values &&
@@ -166,26 +180,40 @@ const RxData = (props) => {
                             <Col span={18} style={ valueStyle }>{doctor.subjectId}</Col>
                         </Row>
                     }
+                    { pharmacistSubject && pharmacist && pharmacistSubject.name && pharmacist.degree &&
+                        <Row style={{ paddingTop:30 }}>
+
+                            <Col span={24}>
+                                <Typography.Title level={5} style= {{ textAlign: 'left' }}>Dispensed by</Typography.Title>
+                            </Col>
+                            {/* <Col span={21}> &nbsp; </Col> */}
+
+                            <Col span={6} style={ keyStyle }>Pharmacist Name:</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(pharmacistSubject.name)}</Col>
+
+                            <Col span={6} style={ keyStyle }>Degree:</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(pharmacist.degree)}</Col>
+
+                            <Col span={6} style={ keyStyle }>License:</Col>
+                            <Col span={18} style={ valueStyle }>{xml1DecodeString(pharmacist.license)}</Col>
+
+                            <Col span={6} style={ keyStyle }>Pharmacist Account:</Col>
+                            <Col span={18} style={ valueStyle }>{pharmacist.subjectId}</Col>
+                        </Row>
+                    }
             </Card>
         }
-        { rxData && rxTokenURI &&
-            <ModalNFT
-                tokenId={props.tokenId}
-                rxData={rxData}
-                rxTokenURI={rxTokenURI}
-                decodedURIImage={decodedURIImage}
-                closable
-            />
-        }
-        </Spin>
-
-        {/* <PharmacistApproval
+        { pharmacistSubject && pharmacist && !pharmacistSubject.name && !pharmacist.degree && 
+            <ApprovePharmacist
               account={props.account}
               contract={props.contract}
               openNotificationWithIcon={props.openNotificationWithIcon}
+              parentObjectName={props.parentObjectName}
               tokenId={props.tokenId}
-        /> */}
-    </>)
+            />
+        }
+        </Spin>
+    )
 }
 
 export default RxData;

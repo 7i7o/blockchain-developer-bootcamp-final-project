@@ -3,8 +3,9 @@ import { Col, Row, Typography } from 'antd';
 import NewSubjectDrawer from './NewSubjectDrawer';
 import NewDocPhDrawer from './NewDocPhDrawer';
 import AccountActionDrawer from './AccountActionDrawer';
+import { OWNER_ACCOUNT } from './utils/constants';
 
-const OWNER_ACCOUNT = '0xe4eDF2ed3C7f1f089ED51cf799b8ffAd034a2766'
+// const OWNER_ACCOUNT = '0xe4eDF2ed3C7f1f089ED51cf799b8ffAd034a2766'
 
 const AdminMenu = (props) => {
 

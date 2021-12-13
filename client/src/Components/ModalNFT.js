@@ -22,7 +22,7 @@ const ModalNFT = (props) => {
       <Button
         type="primary"
         onClick={showModal}
-        style={{ marginTop: 20}}
+        style={{ marginBottom: 10 }}
         className='cAlign'
     >
         Load NFT Image

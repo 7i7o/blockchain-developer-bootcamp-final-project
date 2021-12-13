@@ -35,8 +35,10 @@ const ShowRxDrawer = (props) => {
                     contract={props.contract}
                     openNotificationWithIcon={props.openNotificationWithIcon}
                     tokenId={props.tokenId}
+                    parentObjectName={props.parentObjectName}
                     // rxData={rxData}
                     // rxTokenURI={rxTokenURI}
+                    // parentSetRxData={setRxData}
                 />
                 {/* { props.parentObjectName === "Patient" && 
                     <ApprovePharmacist 

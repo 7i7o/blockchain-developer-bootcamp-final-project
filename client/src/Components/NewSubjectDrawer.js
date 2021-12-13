@@ -5,8 +5,9 @@ import { ethers } from 'ethers';
 import moment from 'moment';
 import UserFullInfo from './UserFullInfo';
 import { xml1EncodeString } from './utils/stringSanitizer';
+import { ZERO_ADDRESS } from './utils/constants';
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+// const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const NewSubjectDrawer = (props) => {
 
@@ -115,7 +116,7 @@ export const NewSubjectDrawer = (props) => {
     }
 
     const onFinish = (values) => {
-        console.log('Received values from form: ', values);
+        // console.log('Received values from form: ', values);
     };
 
     const handleFormSubmit = () => {

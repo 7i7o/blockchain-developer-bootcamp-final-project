@@ -4,8 +4,9 @@ import { PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import UserFullInfo from './UserFullInfo';
 import { xml1EncodeString } from './utils/stringSanitizer';
+import { ZERO_ADDRESS } from './utils/constants';
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+// const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const NewDocPhDrawer = (props) => {
 
@@ -102,7 +103,7 @@ const NewDocPhDrawer = (props) => {
   }
 
   const onFinish = (values) => {
-    console.log('Received values from form: ', values);
+    // console.log('Received values from form: ', values);
   };
 
   const handleFormSubmit = () => {

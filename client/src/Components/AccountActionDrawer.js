@@ -3,8 +3,9 @@ import { Drawer, Form, Button, Input, Space, Spin, Typography } from 'antd';
 import { MinusCircleTwoTone, PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import UserFullInfo from './UserFullInfo';
+import { ZERO_ADDRESS } from './utils/constants';
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+// const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const AccountActionDrawer = (props) => {
 
