@@ -34,6 +34,12 @@ const NewDocPhDrawer = (props) => {
       setVisible(false);
   };
 
+  useEffect ( () => {
+    if (props.account) {
+      onClose();
+    }
+  }, [props.account]);
+
   const checkAccount = (_, value) => {
       if (ethers.utils.isAddress(value)) {
           setValidAccount(true);

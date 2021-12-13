@@ -39,6 +39,12 @@ export const ListRxDrawer = (props) => {
         setVisible(false);
     };
 
+    useEffect ( () => {
+      if (props.account) {
+        onClose();
+      }
+    }, [props.account]);
+
     useEffect( () => {
       if (visible) {
         if (props.parentObjectName === 'Patient') {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button } from 'antd';
 import InlineSVG from 'svg-inline-react';
 
@@ -16,6 +16,13 @@ const ModalNFT = (props) => {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
+
+  useEffect ( () => {
+    if (props.account) {
+      handleCancel();
+    }
+  }, [props.account]);
+
 
   return (
     <>

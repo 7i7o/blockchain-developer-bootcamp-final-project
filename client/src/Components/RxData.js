@@ -197,7 +197,7 @@ const RxData = (props) => {
                             <Col span={6} style={ keyStyle }>License:</Col>
                             <Col span={18} style={ valueStyle }>{xml1DecodeString(pharmacist.license)}</Col>
 
-                            <Col span={6} style={ keyStyle }>Pharmacist Account:</Col>
+                            <Col span={6} style={ keyStyle }>Account:</Col>
                             <Col span={18} style={ valueStyle }>{pharmacist.subjectId}</Col>
                         </Row>
                     }
@@ -210,6 +210,7 @@ const RxData = (props) => {
               openNotificationWithIcon={props.openNotificationWithIcon}
               parentObjectName={props.parentObjectName}
               tokenId={props.tokenId}
+              drawerOnClose={ props.drawerOnClose }
             />
         }
         </Spin>

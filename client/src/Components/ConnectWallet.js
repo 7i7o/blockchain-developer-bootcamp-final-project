@@ -41,7 +41,8 @@ const ConnectWallet = (props) => {
       // let Torus = (await import('@toruslabs/torus-embed')).default
       const web3Modal = new Web3Modal({
         network: NETWORK_NAME,
-        cacheProvider: false,
+        // cacheProvider: false,
+        cacheProvider: true,
         providerOptions: {
           walletconnect: {
             package: WalletConnectProvider,

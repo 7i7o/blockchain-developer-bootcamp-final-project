@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Drawer, Form, Button, Input, Space, Spin, Row, Col, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { ethers } from 'ethers';
@@ -38,6 +38,12 @@ export const MintRxDrawer = (props) => {
     const onClose = () => {
         setVisible(false);
     };
+
+    useEffect ( () => {
+      if (props.account) {
+        onClose();
+      }
+    }, [props.account]);
 
     const checkAccount = (_, value) => {
         if (value === props.account) {

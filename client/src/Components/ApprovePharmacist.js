@@ -1,6 +1,7 @@
-import { Button, Col, Collapse, Form, Input, Row, Space, Typography } from "antd";
+import { Button, Col, Collapse, Form, Input, Row, Space, Spin, Typography } from "antd";
 import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
+import DispenceRx from "./DispenceRx";
 import UserFullInfo from "./UserFullInfo";
 import { ZERO_ADDRESS } from "./utils/constants";
 
@@ -145,14 +146,15 @@ const ApprovePharmacist = (props) => {
                 </Space>
             }
             { props.parentObjectName === 'Pharmacist' && props.account === approvedPharmacist &&
-                <Space style={{ paddingTop: 10, paddingBottom: 10, display: 'flex', justifyContent: 'right' }}>
-                    <Button
-                        onClick={() => props.openNotificationWithIcon('Should Burn Rx Here!') }
-                        // style={{ justifySelf: 'right' }}
-                    >
-                        Mark as Dispensed
-                    </Button>
-                </Space>
+                <DispenceRx 
+                    account={props.account}
+                    contract={props.contract}
+                    openNotificationWithIcon={props.openNotificationWithIcon}
+                    parentObjectName={props.parentObjectName}
+                    tokenId={props.tokenId}
+                    drawerOnClose={ props.drawerOnClose }
+                >
+                </DispenceRx>
             }
             { props.parentObjectName === 'Patient' &&
                 <Collapse
@@ -170,19 +172,21 @@ const ApprovePharmacist = (props) => {
                                     }
                                 }
                             >
-                                <Button
-                                    onClick={clearApprovals}
-                                    disabled={(approvedPharmacist === ZERO_ADDRESS)}
-                                >
-                                    Unassign
-                                </Button>
-                                <Button
-                                    onClick={handleFormSubmit}
-                                    type="primary"
-                                    disabled={!existsPharmacist || loading}
-                                >
-                                    Assign Pharmacist
-                                </Button>
+                                <Spin spinning={ loading } >
+                                    <Button
+                                        onClick={clearApprovals}
+                                        disabled={(approvedPharmacist === ZERO_ADDRESS)}
+                                    >
+                                        Unassign
+                                    </Button>
+                                    <Button
+                                        onClick={handleFormSubmit}
+                                        type="primary"
+                                        disabled={!existsPharmacist || loading}
+                                    >
+                                        Assign Pharmacist
+                                    </Button>
+                                </Spin>
                             </Space>
                         }
                     >

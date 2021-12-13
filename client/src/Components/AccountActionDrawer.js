@@ -47,6 +47,13 @@ export const AccountActionDrawer = (props) => {
         }
     };
 
+    useEffect ( () => {
+      if (props.account) {
+        onClose();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.account]);
+
     const checkAccount = (_, value) => {
       if (ethers.utils.isAddress(value)) {
           setValidAccount(true);
