@@ -2,7 +2,8 @@
 
 // Select these for Rinkeby
 export const NETWORK_ID = 4;
-export const NETWORK_DESC = 'Rinkeby';
+export const NETWORK_NAME = 'rinkeby';
+export const NETWORK_DESC = 'Rinkeby Testnet';
 
 export const OWNER_ACCOUNT = '0xe4eDF2ed3C7f1f089ED51cf799b8ffAd034a2766'
 

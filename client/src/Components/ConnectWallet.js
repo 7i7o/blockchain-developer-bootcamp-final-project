@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { Button, Typography, Row, Col, Space } from 'antd';
-import { NETWORK_ID, NETWORK_DESC } from './utils/constants';
+import { NETWORK_ID, NETWORK_NAME, NETWORK_DESC } from './utils/constants';
 
 import Rx from "../contracts/Rx.json";
 
@@ -40,7 +40,7 @@ const ConnectWallet = (props) => {
     async function getWeb3Modal() {
       // let Torus = (await import('@toruslabs/torus-embed')).default
       const web3Modal = new Web3Modal({
-        network: NETWORK_ID,
+        network: NETWORK_NAME,
         cacheProvider: false,
         providerOptions: {
           walletconnect: {
