@@ -7,6 +7,8 @@ export const NETWORK_DESC = 'Rinkeby Testnet';
 
 export const OWNER_ACCOUNT = '0xe4eDF2ed3C7f1f089ED51cf799b8ffAd034a2766'
 
+export const INFURA_ID = '216ff566890841a191668183133a69e1'
+
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const MAX_KEY_LENGTH = 19
 export const MAX_VALUE_LENGTH = 61

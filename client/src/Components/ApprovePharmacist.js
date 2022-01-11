@@ -20,7 +20,7 @@ const ApprovePharmacist = (props) => {
 
     const [approvedPharmacist, setApprovedPharmacist] = useState(ZERO_ADDRESS);
   
-    const [form] = Form.useForm();
+    const [myForm] = Form.useForm();
   
     useEffect(() => {
         if (props.tokenId) {
@@ -33,7 +33,7 @@ const ApprovePharmacist = (props) => {
     useEffect(() => {
         if (approvedPharmacist) {
             // Get Approved Address from Contract
-            form.setFieldsValue({
+            myForm.setFieldsValue({
                 accountAddress: approvedPharmacist,
             })
             checkAccount(null, approvedPharmacist)
@@ -74,7 +74,7 @@ const ApprovePharmacist = (props) => {
     }
 
     const getSubjectInfo = () => {
-        let subjectId = form.getFieldValue("accountAddress");
+        let subjectId = myForm.getFieldValue("accountAddress");
         if (ethers.utils.isAddress(subjectId)) {
             setLastAccountQueried(subjectId);
             setSearchableSubjectId(subjectId);
@@ -119,7 +119,7 @@ const ApprovePharmacist = (props) => {
     }
 
     const handleFormSubmit = () => {
-        form.validateFields()
+        myForm.validateFields()
             .then((values) => {
                 // console.log('Received values from form: ', values);
                 approvePharmacist(values);
@@ -197,7 +197,7 @@ const ApprovePharmacist = (props) => {
 
                         <Form
                             layout="vertical"
-                            form={form}
+                            form={myForm}
                             onFinish={onFinish}
                             hideRequiredMark
                             // initialValues={{ accountAddress: approvedPharmacist }}

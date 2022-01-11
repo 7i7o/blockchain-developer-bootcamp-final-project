@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { Button, Typography, Row, Col, Space } from 'antd';
-import { NETWORK_ID, NETWORK_NAME, NETWORK_DESC } from './utils/constants';
+import { NETWORK_ID, NETWORK_NAME, NETWORK_DESC, INFURA_ID } from './utils/constants';
 
 import Rx from "../contracts/Rx.json";
 
@@ -47,7 +47,7 @@ const ConnectWallet = (props) => {
           walletconnect: {
             package: WalletConnectProvider,
             options: {
-              infuraId: '216ff566890841a191668183133a69e1'
+              infuraId: INFURA_ID
             },
           },
         },
@@ -87,6 +87,25 @@ const ConnectWallet = (props) => {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.connection])
+
+    const changeNetwork = async () => {
+      if (props.connection && props.account && !props.rightNetwork) {
+        try {
+          await props.connection.request({
+            method: "wallet_switchEthereumChain",
+            params: [ { chainId: `0x${Number(NETWORK_ID).toString(16)}`, } ]
+          });
+        } catch (err) {
+          props.openNotificationWithIcon('Network switch failed', "Couldn't switch to required network. Please switch mannually, re-connect or refresh page.", 'error');
+        }
+      } else {
+        console.log("No connection or already on right network");
+      }
+    };
+    
+    const handleNetworkSwitch = async () => {
+      await changeNetwork();
+    };
 
     // This runs our function when the connection is updated (we have access to the network).
     useEffect(() => {
@@ -148,10 +167,12 @@ const ConnectWallet = (props) => {
                   )}
                   { props.connection && !props.rightNetwork && (
                     <div style={{ float: 'right' }}>
-                        {/* <Typography.Text strong>Rx only works on </Typography.Text>
-                        <Typography.Link href="https://faucet.rinkeby.io/" target="_blank">Rinkeby</Typography.Link>
-                        <Typography.Text strong>. Please change your network.</Typography.Text> */}
-                        <Typography.Text strong>Rx only works on {NETWORK_DESC}. Please change your network.</Typography.Text>
+                      <Space direction="horizontal" align="center">
+                        <Typography.Text strong>
+                          Rx only works on {NETWORK_DESC}. Please change your network.
+                        </Typography.Text>
+                        <Button onClick={handleNetworkSwitch}> Switch Network </Button>
+                      </Space>
                     </div>
                   )}
                   { props.connection && props.rightNetwork && !loggedIn && (
