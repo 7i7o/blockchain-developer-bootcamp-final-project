@@ -2,7 +2,7 @@ require('dotenv').config();
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const path = require("path");
 
-const INFURA_PROJECT_ID = 'https://rinkeby.infura.io/v3/216ff566890841a191668183133a69e1'
+// const INFURA_PROJECT_ID = 'https://rinkeby.infura.io/v3/216ff566890841a191668183133a69e1'
 
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
@@ -21,12 +21,12 @@ module.exports = {
     },
     rinkeby:{
       provider: function() {
-        return new HDWalletProvider(
-          process.env['MNEMONIC'],
-          // process.env['INFURA_PROJECT_ID'],
-          INFURA_PROJECT_ID,
-          0 // Sign / Migrate from first account (it is zero-based)
-        );
+        return new HDWalletProvider({
+          privateKeys: [ process.env['PRIVATE_KEY'], ],
+          providerOrUrl: process.env['INFURA_PROJECT_ID'],
+          // providerOrUrl: INFURA_PROJECT_ID,
+          addressIndex: 0 // Deploy/Migrate from first account (it is zero-based)
+        });
       },
       network_id: 4, // Rinkeby Network Id
     },

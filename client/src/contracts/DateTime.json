@@ -29145,12 +29145,18 @@
     "4": {
       "events": {},
       "links": {},
-      "address": "0xA034D42d3C387da509f6a3f16a777F6fd596a430",
-      "transactionHash": "0x5fe5caf997142de45ef3e95a16f013c6075ee63456bf8cfba765deb6eb4617f1"
+      "address": "0xDda92bf3A85C4B81A959a38Ff2a9ce3C72BB0bA9",
+      "transactionHash": "0x2ed59f0c6c1256ce2c855cff0f1f66db7dc79fa6ff82a6c4bbee1798a85a610a"
+    },
+    "1337": {
+      "events": {},
+      "links": {},
+      "address": "0x37d085ddce13fE00F6c64319d33cDF0e7e9Fca37",
+      "transactionHash": "0x9b0f84cc9644250f7cd892101ad8fd9cc8209adfeb9aa977f2bb81caa338fdef"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-11-30T09:39:18.903Z",
+  "updatedAt": "2022-01-14T14:20:53.732Z",
   "networkType": "ethereum",
   "devdoc": {
     "author": "Piper Merriam https://github.com/pipermerriam",

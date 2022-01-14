@@ -14,6 +14,28 @@ The "Character" column shows the character.
 To render the character, the format &name; is used; for example, &amp; renders as &.
 
 */
+import { ethers } from "ethers";
+
+export const zeroBytes32 = ethers.constants.HashZero;
+
+export const shortenAddress = address => `${address.substr(0,5)}...${address.substr(39,3)}`;
+
+export const parseBytes32String = ethers.utils.parseBytes32String;
+
+export const parse2Bytes32String = (firstWord, secondWord) => {
+    return `${ethers.utils.parseBytes32String(firstWord)}${ethers.utils.parseBytes32String(secondWord)}`;
+}
+
+export const formatBytes32String = (text) => {
+    return ethers.utils.formatBytes32String(text.substr(0,31));
+}
+
+export const format2Bytes32String = (text) => {
+    return [
+            ethers.utils.formatBytes32String(text.substr(0,31)),
+            ethers.utils.formatBytes32String(text.substr(31,31))
+    ];
+}
 
 export const xml1EncodeString = text => {
     if (!text) return text;

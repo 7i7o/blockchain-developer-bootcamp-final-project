@@ -3,7 +3,7 @@ import { Drawer, Form, Button, Input, Space, Spin } from 'antd';
 import { PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import UserFullInfo from './UserFullInfo';
-import { xml1EncodeString } from './utils/stringSanitizer';
+import { formatBytes32String, xml1EncodeString } from './utils/stringSanitizer';
 import { ZERO_ADDRESS } from './utils/constants';
 
 // const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -86,8 +86,8 @@ const NewDocPhDrawer = (props) => {
     // console.log("Contract: ", props.contract)
     
     try {
-      let sanitizedDegree = xml1EncodeString(values.degree);
-      let sanitizedLicense = xml1EncodeString(values.license);
+      let sanitizedDegree = formatBytes32String(xml1EncodeString(values.degree));
+      let sanitizedLicense = formatBytes32String(xml1EncodeString(values.license));
       const txn = await props.asyncContractCallback(
         values.accountAddress,
         sanitizedDegree,
@@ -96,11 +96,13 @@ const NewDocPhDrawer = (props) => {
       props.openNotificationWithIcon(`Starting 'Add ${props.objectName}' transaction.`);
       await txn.wait();
       onClose();
-      props.openNotificationWithIcon(`Transaction finished succesfully.`,`${props.objectName} Added: {
-        Account: ${values.accountAddress},
-        Degree: ${values.degree},
-        License: ${values.license}
-      }`);
+      // props.openNotificationWithIcon(`Transaction finished succesfully.`,`${props.objectName} Added: {
+      //   Account: ${values.accountAddress},
+      //   Degree: ${values.degree},
+      //   License: ${values.license}
+      // }`);
+      props.openNotificationWithIcon(`Transaction submitted`,`Waiting transaction confirmation for ${props.objectName} '${values.accountAddress}'`);
+
     } catch (error) {
       console.log(error);
       props.openNotificationWithIcon('Transaction Failed!','Please check the console for error messages', 'error');
@@ -115,7 +117,7 @@ const NewDocPhDrawer = (props) => {
   const handleFormSubmit = () => {
     form.validateFields()
         .then((values) => {
-            console.log('Received values from form: ', values);
+            // console.log('Received values from form: ', values);
             add(values);
         })
         .catch((errorInfo) => {

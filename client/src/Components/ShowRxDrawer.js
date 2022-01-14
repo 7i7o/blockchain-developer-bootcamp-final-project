@@ -43,28 +43,7 @@ const ShowRxDrawer = (props) => {
                     tokenId={props.tokenId}
                     parentObjectName={props.parentObjectName}
                     drawerOnClose={onClose}
-                    // rxData={rxData}
-                    // rxTokenURI={rxTokenURI}
-                    // parentSetRxData={setRxData}
                 />
-                {/* { props.parentObjectName === "Patient" && 
-                    <ApprovePharmacist 
-                        account={props.account}
-                        contract={props.contract}
-                        openNotificationWithIcon={props.openNotificationWithIcon}
-                        tokenId={props.tokenId}
-                        parentObjectName={props.parentObjectName}
-                    />
-                } */}
-                {/* { props.parentObjectName === "Pharmacist" && 
-                    <PharmacistBurnAction 
-                        account={props.account}
-                        contract={props.contract}
-                        openNotificationWithIcon={props.openNotificationWithIcon}
-                        tokenId={props.tokenId}
-                        parentObjectName={props.parentObjectName}
-                    />
-                } */}
             </Drawer>
         </>
     );

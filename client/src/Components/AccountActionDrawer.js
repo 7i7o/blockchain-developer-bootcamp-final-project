@@ -19,8 +19,6 @@ export const AccountActionDrawer = (props) => {
     const [existsDoctor, setExistsDoctor] = useState(false);
     const [existsPharmacist, setExistsPharmacist] = useState(false);
 
-
-    
     // const [resultSubjectId, setResultSubjectId] = useState("");
     // const [resultName, setResultName] = useState("");
     // const [resultBirthDate, setResultBirthDate] = useState(0);
@@ -79,30 +77,30 @@ export const AccountActionDrawer = (props) => {
       }
     
     const accountAction = async (values) => {
-        /* Here goes the Web3 Contract Call !!! */
-        setLoading(true);
 
-        try {
-          const params = 
-            (props.objectName === "Role") ? 
-                (props.accountAction === "Pause")
-              : values.accountAddress ;
+      setLoading(true);
 
-          const txn = await props.asyncContractCallback(params);
+      try {
+        const params = 
+          (props.objectName === "Self Grant Admin") ? 
+              (props.accountAction === "Enable")
+            : values.accountAddress ;
 
-          props.openNotificationWithIcon(
-            <Typography.Text>Starting '{props.accountAction} {props.objectName}' transaction.</Typography.Text>
-          );
-          await txn.wait();
-          onClose();
-          props.openNotificationWithIcon(`Transaction finished succesfully.`,`Action '${props.accountAction} ${props.objectName}' performed on Account: ${params}`);
+        const txn = await props.asyncContractCallback(params);
 
-        } catch (error) {
-          console.log(error);
-          props.openNotificationWithIcon('Transaction Failed!','Please check the console for error messages', 'error');
-        }
-        
-        setLoading(false);
+        props.openNotificationWithIcon(
+          <Typography.Text>Starting '{props.accountAction} {props.objectName}' transaction.</Typography.Text>
+        );
+        await txn.wait();
+        onClose();
+        props.openNotificationWithIcon(`Transaction submitted succesfully`,`Action '${props.accountAction} ${props.objectName}' performed on Account: ${params}`);
+
+      } catch (error) {
+        console.log(error);
+        props.openNotificationWithIcon('Transaction Failed!','Please check the console for error messages', 'error');
+      }
+      
+      setLoading(false);
     }
 
     const onFinish = (values) => {
@@ -165,7 +163,9 @@ export const AccountActionDrawer = (props) => {
                 ''))}
           style={{minWidth: props.buttonSize}}
         >
-          {`${props.accountAction} ${props.objectName}`}
+          {
+            `${props.accountAction} ${props.objectName}`
+          }
         </Button>
         <Drawer
           title={`${props.accountAction} ${props.objectName}`}
@@ -184,12 +184,6 @@ export const AccountActionDrawer = (props) => {
                   disabled={
                     loading 
                     || !validAccount
-                    // || (props.accountAction === 'Remove' &&
-                    //     ( (props.objectName === 'Pharmacist' && !existsPharmacist)
-                    //     ||(props.objectName === 'Doctor' && !existsDoctor)
-                    //     ||(props.objectName === 'Patient' && (existsPharmacist || existsDoctor || !existsSubject) )
-                    //     )
-                    // )
                   }
                 >
                   {props.accountAction}

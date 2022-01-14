@@ -4,7 +4,7 @@ import { PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import moment from 'moment';
 import UserFullInfo from './UserFullInfo';
-import { xml1EncodeString } from './utils/stringSanitizer';
+import { format2Bytes32String, xml1EncodeString } from './utils/stringSanitizer';
 import { ZERO_ADDRESS } from './utils/constants';
 
 // const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -94,26 +94,27 @@ export const NewSubjectDrawer = (props) => {
 
         try {
           let birthDateInSeconds = Math.ceil(values.birthDate.valueOf() / 1000);
-          let sanitizedName = xml1EncodeString(values.fullName);
-          let sanitizedHomeAddress = xml1EncodeString(values.homeAddress);
+          let [sanitizedNameA, sanitizedNameB] = format2Bytes32String(xml1EncodeString(values.fullName));
+          let [sanitizedHomeAddressA, sanitizedHomeAddressB] = format2Bytes32String(xml1EncodeString(values.homeAddress));
           
           const txn = await props.contract.setSubjectData(
               values.accountAddress,
               birthDateInSeconds,
-              sanitizedName,
-              sanitizedHomeAddress
+              sanitizedNameA, sanitizedNameB,
+              sanitizedHomeAddressA, sanitizedHomeAddressB
           );
           props.openNotificationWithIcon(`Starting 'Add Patient' transaction.`);
           await txn.wait();
           // props.openNotificationWithIcon(`Transaction finished succesfully.`);
-          let birthDate = new Date(birthDateInSeconds * 1000)
+          // let birthDate = new Date(birthDateInSeconds * 1000)
           onClose();
-          props.openNotificationWithIcon(`Transaction finished succesfully.`,`Patient Added: {
-            Account: ${values.accountAddress},
-            Name: ${values.fullName},
-            Date of Birth: ${birthDate.toDateString()},
-            Home Address: ${values.homeAddress}
-          }`);
+          // props.openNotificationWithIcon(`Transaction finished succesfully.`,`Patient Added: {
+          //   Account: ${values.accountAddress},
+          //   Name: ${values.fullName},
+          //   Date of Birth: ${birthDate.toDateString()},
+          //   Home Address: ${values.homeAddress}
+          // }`);
+          props.openNotificationWithIcon(`Transaction submitted`,`Waiting transaction confirmation for patient '${values.accountAddress}'`);
         } catch (error) {
           console.log(error);
           props.openNotificationWithIcon('Transaction Failed!','Please check the console for error messages', 'error');
@@ -128,7 +129,7 @@ export const NewSubjectDrawer = (props) => {
     const handleFormSubmit = () => {
         form.validateFields()
             .then((values) => {
-                console.log('Received values from form: ', values);
+                // console.log('Received values from form: ', values);
                 addSubject(values);
             })
             .catch((errorInfo) => {

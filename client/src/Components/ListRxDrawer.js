@@ -295,17 +295,8 @@ export const ListRxDrawer = (props) => {
               pagination={{pageSize: 6,}}
               renderItem={item => (
                 <List.Item>
-                  {/* <Card title={`Rx# ${item.tokenId}`}>
-                    <p>Doctor: {item.sender}</p>
-                    <p>Patient: {item.receiver}</p>
-                  </Card>
-                  */}
                     <List.Item.Meta
-                      //avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
                       title={
-                        // <Typography.Link href="#">
-                        //   {`Rx# ${item.tokenId}`}
-                        // </Typography.Link>
                         <ShowRxDrawer
                           account={props.account}
                           contract={props.contract}

@@ -4,7 +4,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import SubjectData from './SubjectData';
 import DocPhData from './DocPhData';
-import { xml1EncodeString } from './utils/stringSanitizer';
+import { format2Bytes32String, formatBytes32String, xml1EncodeString } from './utils/stringSanitizer';
 import { MAX_KEY_LENGTH, MAX_VALUE_LENGTH, ZERO_ADDRESS } from './utils/constants';
 
 // const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -96,13 +96,31 @@ export const MintRxDrawer = (props) => {
         // console.log('Received values from form: ', values);
     };
 
+    const getValuesArrayForTxn = (values) => {
+      let a = format2Bytes32String(values.value1);
+      let b = format2Bytes32String(values.value2);
+      let c = format2Bytes32String(values.value3);
+      let d = format2Bytes32String(values.value4);
+      let e = format2Bytes32String(values.value5);
+      let f = format2Bytes32String(values.value6);
+      let g = format2Bytes32String(values.value7);
+      let h = format2Bytes32String(values.value8);
+      let i = format2Bytes32String(values.value9);
+      let j = format2Bytes32String(values.value10);
+      let k = format2Bytes32String(values.value11);
+      let l = format2Bytes32String(values.value12);
+      return [ ...a, ...b, ...c, ...d, ...e, ...f, ...g, ...h, ...i, ...j, ...k, ...l ];
+    }
+
+
     const mintRx = async (values) => {
       /* Here goes the Web3 Contract Call !!! */
       setLoading(true);
       
       try{
-        const keys = [values.key1, values.key2, values.key3, values.key4, values.key5, values.key6, values.key7, values.key8, values.key9, values.key10, values.key11, values.key12 ].map(xml1EncodeString)
-        const vals = [values.value1, values.value2, values.value3, values.value4, values.value5, values.value6, values.value7, values.value8, values.value9, values.value10, values.value11, values.value12 ].map(xml1EncodeString)
+        const keys = [values.key1, values.key2, values.key3, values.key4, values.key5, values.key6, values.key7, values.key8, values.key9, values.key10, values.key11, values.key12 ].map(formatBytes32String).map(xml1EncodeString)
+        // const vals = [values.value1, values.value2, values.value3, values.value4, values.value5, values.value6, values.value7, values.value8, values.value9, values.value10, values.value11, values.value12 ].map(xml1EncodeString)
+        const vals = getValuesArrayForTxn(values).map(xml1EncodeString);
         const txn = await props.contract.mint(
             values.accountAddress,
             keys,
@@ -288,17 +306,6 @@ export const MintRxDrawer = (props) => {
                 objectName="Doctor"
               /> )
         }
-        {/* { props.contract &&
-            ( <DocPhData
-                account={props.account}
-                contract={props.contract}
-                openNotificationWithIcon={props.openNotificationWithIcon}
-                subjectId={searchableSubjectId}
-                existsDocPh={existsPharmacist} setExistsDocPh={setExistsPharmacist}
-                asyncContractCallback={props.contract.getPharmacist}
-                objectName="Pharmacist"
-            /> )
-        } */}
         </Drawer>
       </>
     );

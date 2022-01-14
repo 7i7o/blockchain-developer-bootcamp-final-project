@@ -2,24 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import { Button, Typography, Row, Col, Space } from 'antd';
-import { NETWORK_ID, NETWORK_NAME, NETWORK_DESC, INFURA_ID } from './utils/constants';
+import { Button, Typography, Row, Col, Space, Tooltip } from 'antd';
+import { NETWORK, INFURA_ID } from './utils/constants';
 
 import Rx from "../contracts/Rx.json";
-
-// const NETWORKS = {
-//   1: "Ethereum Mainnet",
-//   42: "Kovan Testnet",
-//   3: "Ropsten Testnet",
-//   4: "Rinkeby Testnet",
-//   5: "Goerli Testnet",
-// }
-
-// const CONTRACT_ADDRESS = '0x668931aE15C2062BC5002306E1FeED42abdcEf8F' // v1 on Rinkeby
-// const CONTRACT_ADDRESS = '0x995c9446cEC8b39b16b10C8cbD4f99C7BD0c488C' // v2 on Rinkeby
-// const CONTRACT_ADDRESS = '0x9C93012205267eaa97b352ab1add200C0DEF5282' // v3 on Rinkeby
-// const CONTRACT_ADDRESS = '0x33ea420C549a71079C7e16A541aB788f9297B681' // v4 on Rinkeby
-// const CONTRACT_ADDRESS = '0xC1B0e5f6771fC4327E8643579EC14C4Ce4C8CDd9' // v5 on Rinkeby
+import { shortenAddress } from './utils/stringSanitizer';
 
 const ConnectWallet = (props) => {
 
@@ -40,14 +27,15 @@ const ConnectWallet = (props) => {
     async function getWeb3Modal() {
       // let Torus = (await import('@toruslabs/torus-embed')).default
       const web3Modal = new Web3Modal({
-        network: NETWORK_NAME,
+        network: NETWORK.NAME,
         // cacheProvider: false,
         cacheProvider: true,
         providerOptions: {
           walletconnect: {
             package: WalletConnectProvider,
             options: {
-              infuraId: INFURA_ID
+              infuraId: INFURA_ID,
+              networkParams: NETWORK.PARAMS,
             },
           },
         },
@@ -74,7 +62,7 @@ const ConnectWallet = (props) => {
       const provider = new ethers.providers.Web3Provider(props.connection)
       const networkInfo = await provider.getNetwork();
       if (networkInfo && networkInfo.chainId) {
-        props.setRightNetwork(networkInfo.chainId === NETWORK_ID);
+        props.setRightNetwork(networkInfo.chainId === NETWORK.ID);
       } else {
         props.setRightNetwork(false);
       }
@@ -93,7 +81,7 @@ const ConnectWallet = (props) => {
         try {
           await props.connection.request({
             method: "wallet_switchEthereumChain",
-            params: [ { chainId: `0x${Number(NETWORK_ID).toString(16)}`, } ]
+            params: [ { chainId: `0x${Number(NETWORK.ID).toString(16)}`, } ]
           });
         } catch (err) {
           props.openNotificationWithIcon('Network switch failed', "Couldn't switch to required network. Please switch mannually, re-connect or refresh page.", 'error');
@@ -122,7 +110,7 @@ const ConnectWallet = (props) => {
         const provider = new ethers.providers.Web3Provider(props.connection)
         const signer = provider.getSigner()
         const connectedContract = new ethers.Contract(
-                                                Rx.networks[NETWORK_ID].address,
+                                                Rx.networks[NETWORK.ID].address,
                                                 Rx.abi,
                                                 signer);
         props.setContract(connectedContract);
@@ -169,7 +157,7 @@ const ConnectWallet = (props) => {
                     <div style={{ float: 'right' }}>
                       <Space direction="horizontal" align="center">
                         <Typography.Text strong>
-                          Rx only works on {NETWORK_DESC}. Please change your network.
+                          Rx only works on {NETWORK.DESC}. Please change your network.
                         </Typography.Text>
                         <Button onClick={handleNetworkSwitch}> Switch Network </Button>
                       </Space>
@@ -181,7 +169,19 @@ const ConnectWallet = (props) => {
                   { props.connection && props.rightNetwork && loggedIn && (
                     <div style={{ float: 'right' }}>
                       <Space direction="horizontal" align="center">
-                        <Typography.Text italic>Welcome, {props.account}</Typography.Text>
+                        <Typography.Text>Welcome,</Typography.Text>
+                        <Typography.Text italic>
+                          <Tooltip title={`User: ${props.account}`}>
+                            {shortenAddress(props.account)}
+                          </Tooltip>
+                        </Typography.Text>
+                        <Typography.Text>
+                          (
+                            <Tooltip title={`Contract: ${(props.contract && props.contract.address) ? props.contract.address : ''}`}>
+                              {NETWORK.NAME}
+                            </Tooltip>
+                          )
+                        </Typography.Text>
                         <Button onClick={signOut} >Sign Out</Button>
                       </Space>
                     </div>
