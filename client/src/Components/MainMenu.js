@@ -6,6 +6,13 @@ import ListRxDrawer from './ListRxDrawer';
 const MainMenu = (props) => {
 
     return (<>
+        {/* {props.contract && 
+            (<Row className="centerChilds">
+                <Col span={24} className="centerChilds" style={{padding:5}}>
+                    <Typography.Title level={5}>Contract: {props.contract}</Typography.Title>
+                </Col>
+            </Row>)
+        } */}
         {props.contract && 
             (<Row className="centerChilds">
                 <Col span={24} className="centerChilds" style={{padding:5}}>

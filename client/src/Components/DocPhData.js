@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Spin } from 'antd';
+import { xml1DecodeString, parseBytes32String } from './utils/stringSanitizer';
 
 const DocPhData = (props) => {
 
@@ -21,19 +22,21 @@ const DocPhData = (props) => {
         try {
             result = await props.asyncContractCallback(subjectId);
         } catch (error) { console.log(error); setLoading(false); }
-
+        
         if (result) {
+            let sanitizedDegree = xml1DecodeString(parseBytes32String(result.degree));
+            let sanitizedLicense = xml1DecodeString(parseBytes32String(result.license));
             setDocPhData({
                             subjectId: result.subjectId,
-                            degree: result.degree,
-                            license: result.license
+                            degree: sanitizedDegree,
+                            license: sanitizedLicense
             });
             if (props.stateFull) {
                 props.setResultSubjectId(result.subjectId);
-                props.setResultDegree(result.degree);
-                props.setResultLicense(result.license);
+                props.setResultDegree(sanitizedDegree);
+                props.setResultLicense(sanitizedLicense);
             }
-            if (result.degree && result.degree.length) {
+            if (sanitizedDegree && sanitizedDegree.length) {
                 props.setExistsDocPh(true);
             } else {
                 props.setExistsDocPh(false);

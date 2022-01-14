@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Drawer, Button, Spin, List, Typography, Row, Col, Form, Input, Space } from 'antd';
+import { Drawer, Button, Spin, List, Typography, Row, Col, Form, Input, Space, InputNumber } from 'antd';
 import { MinusCircleTwoTone, PlusCircleTwoTone, ProfileTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import ShowRxDrawer from './ShowRxDrawer';
+import { ZERO_ADDRESS } from './utils/constants';
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+// const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 /***** MODIFICAR TODO !!! *****/
 
@@ -15,16 +16,20 @@ export const ListRxDrawer = (props) => {
     const [loading, setLoading] = useState(false);
 
     const [validAccount, setValidAccount] = useState(false);
+    const [validTokenId, setValidTokenId] = useState(false);
     
     const [rxList, setRxList] = useState([]);
+    
+    const [searchRxByTokenId, setSearchRxByTokenId] = useState(null);
 
     const [searchRxByReceiver, setSearchRxByReceiver] = useState(null);
     const [searchRxBySender, setSearchRxBySender] = useState(null);
-    const [searchRxByFrom, setSearchRxByFrom] = useState(null);
-    const [searchRxByTo, setSearchRxByTo] = useState(null);
+    const [searchRxByOwner, setSearchRxByOwner] = useState(null);
+    const [searchRxByApproved, setSearchRxByApproved] = useState(null);
     // const [searchRxByTokenId, setSearchRxByTokenId] = useState(null);
 
     const [form] = Form.useForm();
+    const [formTokenId] = Form.useForm();
 
     const showDrawer = () => {
         setVisible(true);
@@ -34,6 +39,12 @@ export const ListRxDrawer = (props) => {
         setVisible(false);
     };
 
+    useEffect ( () => {
+      if (props.account) {
+        onClose();
+      }
+    }, [props.account]);
+
     useEffect( () => {
       if (visible) {
         if (props.parentObjectName === 'Patient') {
@@ -41,7 +52,7 @@ export const ListRxDrawer = (props) => {
         } else if (props.parentObjectName === 'Doctor') {
             setSearchRxBySender(props.account)
         } else if (props.parentObjectName === 'Pharmacist') {
-            setSearchRxByTo(props.account)
+            setSearchRxByApproved(props.account)
         } else {
           setRxList([])
         }
@@ -55,9 +66,20 @@ export const ListRxDrawer = (props) => {
     }, [searchRxByReceiver, searchRxBySender]);
   
     useEffect( () => {
-      getApprovalRxList(searchRxByFrom, searchRxByTo, null);
+      getApprovalRxList(searchRxByOwner, searchRxByApproved, null);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchRxByOwner, searchRxByApproved]);
+    
+    useEffect( () => {
+      if (props.parentObjectName === 'Patient') {
+        getMintedRxList(searchRxBySender, searchRxByReceiver, searchRxByTokenId)
+      } else if (props.parentObjectName === 'Doctor') {
+        getMintedRxList(searchRxBySender, searchRxByReceiver, searchRxByTokenId)
+      } else if (props.parentObjectName === 'Pharmacist') {
+        getApprovalRxList(searchRxByOwner, searchRxByApproved, searchRxByTokenId);
+      }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchRxByFrom, searchRxByTo]);
+    }, [searchRxByTokenId]);
 
     // useEffect( () => {
     //   getMintedRxList(null, null, searchRxByTokenId);
@@ -71,10 +93,10 @@ export const ListRxDrawer = (props) => {
       }
     }
 
-    const decodeTransfer = item => {
+    const decodeApproval = item => {
       return {
-        from: item.args.from,
-        to: item.args.to,
+        from: item.args.owner,
+        to: item.args.approved,
         tokenId: item.args.tokenId.toNumber(),
       }
     }
@@ -86,7 +108,7 @@ export const ListRxDrawer = (props) => {
     }
 
     const getApprovalRxList = async (from, to, tokenId) => {
-      getRxList(from, to, tokenId, props.contract.filters.Approval, decodeTransfer, filterFromZeroAddress);
+      getRxList(from, to, tokenId, props.contract.filters.Approval, decodeApproval, filterFromZeroAddress);
     }
 
     const getRxList = async (from, to, tokenId, asyncCallback, decodeCallback, filterCallback) => {
@@ -98,12 +120,18 @@ export const ListRxDrawer = (props) => {
           result = await props.contract.queryFilter(logFilter);
         } catch (error) { console.log(error); setLoading(false); }
         setLoading(false);
-        console.log(result)
+        // console.log(result)
         if (result) {
+          const allResults = result.map(decodeCallback);
+          const noDuplicatesResult = allResults.filter(
+            (item, index, self) => {
+              return index === self.findIndex( i => { return i.tokenId === item.tokenId } )
+            }
+          )
           if (filterCallback !== null) {
-            setRxList((result.map(decodeCallback)).filter(filterCallback))
+            setRxList(noDuplicatesResult.filter(filterCallback))
           } else {
-            setRxList(result.map(decodeCallback))
+            setRxList(noDuplicatesResult)
           }
         } else {
           setRxList([])
@@ -122,30 +150,62 @@ export const ListRxDrawer = (props) => {
  
     const handleFormSubmit = () => {
         form.validateFields()
-            .then((values) => {
-                onFinish(values);
-            })
-            .catch((errorInfo) => {
-                //console.log(errorInfo);
-            });
+          .then((values) => {
+              onFinish(values);
+          })
+          .catch((errorInfo) => { }//console.log(errorInfo); 
+        );
     }
 
     const onFinish = (values) => {
+      clearTokenIdFilter();
       if (props.parentObjectName === 'Doctor') {
         setSearchRxByReceiver(values.accountAddress)
       } else if (props.parentObjectName === 'Pharmacist') {
-        setSearchRxByFrom(values.accountAddress)
+        setSearchRxByOwner(values.accountAddress)
       }
       // console.log('Received values from form: ', values);
     };
   
-    const clearFilter = () => {
-      form.setFieldsValue({accountAddress: ''})
+    const handleFormSubmitTokenId = () => {
+      formTokenId.validateFields()
+        .then((values) => {
+          onFinishTokenId(values);
+        })
+        .catch((errorInfo) => { }//console.log(errorInfo); 
+      );
+    }
+
+    const onFinishTokenId = (values) => {
+      clearPatientFilter();
+      setSearchRxByTokenId(values.tokenIdSearch)
+    }
+
+    const handleTokenIdChange = (value) => {
+      // console.log(value)
+      if (value > 0) {
+        setValidTokenId(true);
+      }
+    }
+
+    const clearPatientFilter = () => {
+      form.setFieldsValue({accountAddress: ''});
       if (props.parentObjectName === 'Doctor') {
         setSearchRxByReceiver(null)
       } else if (props.parentObjectName === 'Pharmacist') {
-        setSearchRxByFrom(null)
+        setSearchRxByOwner(null)
       }
+    }
+
+    const clearTokenIdFilter = () => {
+      formTokenId.setFieldsValue({tokenIdSearch: ''});
+      setSearchRxByTokenId(null);
+      setValidTokenId(false);
+    }
+
+    const clearFilters = () => {
+      clearPatientFilter();
+      clearTokenIdFilter();
     }
 
     return (
@@ -176,14 +236,19 @@ export const ListRxDrawer = (props) => {
           visible={visible}
           bodyStyle={{ paddingBottom: 80 }}
           // getContainer={false} // Remove Warning about Form.useForm() not connected to Form element
-          extra={
+          extra={ 
             <Spin spinning={loading}>
                 <Space>
-                  <Button onClick={clearFilter} disabled={loading}>
-                    Clear Filter
+                  <Button onClick={clearFilters} disabled={loading}>
+                    Clear Filters
                   </Button>
-                  <Button onClick={handleFormSubmit} type="primary" disabled={!validAccount || loading} >
-                    Filter by Patient
+                  { ( props.parentObjectName === 'Doctor' || props.parentObjectName === 'Pharmacist') &&
+                      <Button onClick={handleFormSubmit} type="primary" disabled={!validAccount || loading} >
+                        Filter by Patient
+                      </Button>
+                  }
+                  <Button onClick={handleFormSubmitTokenId} type="primary" disabled={loading || !validTokenId} >
+                    Filter by Rx#
                   </Button>
                 </Space>
             </Spin>
@@ -193,7 +258,7 @@ export const ListRxDrawer = (props) => {
               <Form
                 layout="vertical"
                 form={form}
-                onFinish={onFinish}
+                // onFinish={onFinish}
                 hideRequiredMark
               >
                 <Form.Item
@@ -205,6 +270,23 @@ export const ListRxDrawer = (props) => {
                 </Form.Item>
               </Form>
           }
+          {/* { ( props.parentObjectName === 'Doctor' || props.parentObjectName === 'Pharmacist') && */}
+          { 
+              <Form
+                layout="vertical"
+                form={formTokenId}
+                // onFinish={onFinishTokenId}
+                hideRequiredMark
+              >
+                <Form.Item
+                    name="tokenIdSearch"
+                    label="Rx#"
+                    // rules={[{ validator: checkTokenId, }]}
+                >
+                  <InputNumber min={1} disabled={loading} onChange={handleTokenIdChange}/>
+                </Form.Item>
+              </Form>
+          }
           <Spin spinning={loading} >
             <List
               itemLayout="horizontal"
@@ -213,17 +295,8 @@ export const ListRxDrawer = (props) => {
               pagination={{pageSize: 6,}}
               renderItem={item => (
                 <List.Item>
-                  {/* <Card title={`Rx# ${item.tokenId}`}>
-                    <p>Doctor: {item.sender}</p>
-                    <p>Patient: {item.receiver}</p>
-                  </Card>
-                  */}
                     <List.Item.Meta
-                      //avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
                       title={
-                        // <Typography.Link href="#">
-                        //   {`Rx# ${item.tokenId}`}
-                        // </Typography.Link>
                         <ShowRxDrawer
                           account={props.account}
                           contract={props.contract}
@@ -237,10 +310,10 @@ export const ListRxDrawer = (props) => {
                       description={<>
                         <Row>
                           <Col span={24}>
-                            <Typography.Text >Doctor: {item.from}</Typography.Text>
+                            <Typography.Text >{props.parentObjectName === 'Pharmacist' ? 'Patient' : 'Doctor'}: {item.from}</Typography.Text>
                           </Col>
                           <Col span={24}>
-                            <Typography.Text >Patient: {item.to}</Typography.Text>
+                            <Typography.Text >{props.parentObjectName === 'Pharmacist' ? '' : `Patient: ${item.to}`}</Typography.Text>
                           </Col>
                         </Row>
                       </>}

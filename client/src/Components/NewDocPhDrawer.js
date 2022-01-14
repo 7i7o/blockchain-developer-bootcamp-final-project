@@ -3,8 +3,10 @@ import { Drawer, Form, Button, Input, Space, Spin } from 'antd';
 import { PlusCircleTwoTone } from '@ant-design/icons';
 import { ethers } from 'ethers';
 import UserFullInfo from './UserFullInfo';
+import { formatBytes32String, xml1EncodeString } from './utils/stringSanitizer';
+import { ZERO_ADDRESS } from './utils/constants';
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+// const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const NewDocPhDrawer = (props) => {
 
@@ -31,6 +33,12 @@ const NewDocPhDrawer = (props) => {
   const onClose = () => {
       setVisible(false);
   };
+
+  useEffect ( () => {
+    if (props.account) {
+      onClose();
+    }
+  }, [props.account]);
 
   const checkAccount = (_, value) => {
       if (ethers.utils.isAddress(value)) {
@@ -78,19 +86,23 @@ const NewDocPhDrawer = (props) => {
     // console.log("Contract: ", props.contract)
     
     try {
+      let sanitizedDegree = formatBytes32String(xml1EncodeString(values.degree));
+      let sanitizedLicense = formatBytes32String(xml1EncodeString(values.license));
       const txn = await props.asyncContractCallback(
         values.accountAddress,
-        values.degree,
-        values.license
+        sanitizedDegree,
+        sanitizedLicense
       );
       props.openNotificationWithIcon(`Starting 'Add ${props.objectName}' transaction.`);
       await txn.wait();
       onClose();
-      props.openNotificationWithIcon(`Transaction finished succesfully.`,`${props.objectName} Added: {
-        Account: ${values.accountAddress},
-        Degree: ${values.degree},
-        License: ${values.license}
-      }`);
+      // props.openNotificationWithIcon(`Transaction finished succesfully.`,`${props.objectName} Added: {
+      //   Account: ${values.accountAddress},
+      //   Degree: ${values.degree},
+      //   License: ${values.license}
+      // }`);
+      props.openNotificationWithIcon(`Transaction submitted`,`Waiting transaction confirmation for ${props.objectName} '${values.accountAddress}'`);
+
     } catch (error) {
       console.log(error);
       props.openNotificationWithIcon('Transaction Failed!','Please check the console for error messages', 'error');
@@ -99,13 +111,13 @@ const NewDocPhDrawer = (props) => {
   }
 
   const onFinish = (values) => {
-    console.log('Received values from form: ', values);
+    // console.log('Received values from form: ', values);
   };
 
   const handleFormSubmit = () => {
     form.validateFields()
         .then((values) => {
-            console.log('Received values from form: ', values);
+            // console.log('Received values from form: ', values);
             add(values);
         })
         .catch((errorInfo) => {
@@ -136,7 +148,11 @@ const NewDocPhDrawer = (props) => {
             <Spin spinning={loading}>
               <Space>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleFormSubmit} type="primary">
+                <Button
+                  onClick={handleFormSubmit}
+                  type="primary"
+                  disabled={ loading || !validAccount || !existsSubject }
+                >
                   Save
                 </Button>
               </Space>

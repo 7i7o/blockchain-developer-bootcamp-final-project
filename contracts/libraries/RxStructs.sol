@@ -3,10 +3,10 @@ pragma solidity 0.8.9;
 
 library RxStructs {
 
-    uint256 constant MAX_KEY_LENGTH = 20;
-    uint256 constant MAX_VALUE_LENGTH = 62;
-    uint256 constant RX_LINES = 12;
-    uint256 constant LINE_PADDING = 30;
+    // uint8 internal constant MAX_KEY_LENGTH = 20;
+    // uint8 internal constant MAX_VALUE_LENGTH = 62;
+    uint8 internal constant RX_LINES = 12; // Has to be same value as in RxStructs !!!
+    uint8 internal constant LINE_PADDING = 30;
     
     /// @notice enum to reflect diferent states of the Prescription
     /// @param Draft reflects a Prescription that is not minted yet
@@ -24,8 +24,10 @@ library RxStructs {
     struct Subject {
         address subjectId;
         uint256 birthDate;
-        string name;
-        string homeAddress;
+        bytes32 nameA;
+        bytes32 nameB;
+        bytes32 homeAddressA;
+        bytes32 homeAddressB;
     }
 
     /// @notice struct to store a doctor (minter) details
@@ -35,8 +37,8 @@ library RxStructs {
     /// @dev @param workplaces is a feature for future implementations
     struct Doctor {
         address subjectId;
-        string degree;
-        string license;
+        bytes32 degree;
+        bytes32 license;
         // TODO: address[] workplaces;
     }
 
@@ -47,8 +49,8 @@ library RxStructs {
     /// @dev @param workplaces is a feature for future implementations
     struct Pharmacist {
         address subjectId;
-        string degree;
-        string license;
+        bytes32 degree;
+        bytes32 license;
         // TODO: address[] workplaces;
     }
 
@@ -70,8 +72,8 @@ library RxStructs {
         Subject pharmacistSubject;
         Doctor doctor;
         Pharmacist pharmacist;
-        string[RX_LINES] keys;
-        string[RX_LINES] values;
+        bytes32[RX_LINES] keys;
+        bytes32[2*RX_LINES] values;
         // address pharmacistSubjectId;
     }
 

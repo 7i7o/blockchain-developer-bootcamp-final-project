@@ -3,11 +3,11 @@ import { Col, Row, Typography } from 'antd';
 import NewSubjectDrawer from './NewSubjectDrawer';
 import NewDocPhDrawer from './NewDocPhDrawer';
 import AccountActionDrawer from './AccountActionDrawer';
-
-const OWNER_ACCOUNT = '0xe4eDF2ed3C7f1f089ED51cf799b8ffAd034a2766'
+import { zeroBytes32 } from './utils/stringSanitizer';
 
 const AdminMenu = (props) => {
 
+    const [isOwner, setIsOwner] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [refreshData, setRefreshData] = useState(false);
@@ -17,6 +17,7 @@ const AdminMenu = (props) => {
             if (props.contract && props.account) {
                 checkIsAdmin();
                 checkIsPaused();
+                checkIsOwner();
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [props.contract, props.account, refreshData])
@@ -33,10 +34,20 @@ const AdminMenu = (props) => {
 
         const checkIsPaused = async () => {
             try {
-                const result = await props.contract.getPausableRolePaused();
+                const result = await props.contract.getSelfGrantAdmin();
                 setIsPaused(result);
             } catch (error) {
                 props.openNotificationWithIcon('getPausable Check Failed','Getting pausable failed. Check the console for more info.', 'error');
+                console.log(error);
+            }
+        }
+
+        const checkIsOwner = async () => {
+            try {
+                const result = await props.contract.hasRole(zeroBytes32, props.account);
+                setIsOwner(result);
+            } catch (error) {
+                props.openNotificationWithIcon('Owner Check Failed','DEFAULT_ADMIN_ROLE check failed. Check the console for more info.', 'error');
                 console.log(error);
             }
         }
@@ -170,11 +181,8 @@ const AdminMenu = (props) => {
             </Col>
             </Row>
         }
-        { props.contract  && props.account === OWNER_ACCOUNT &&
+        { props.contract  && isOwner &&
             (<Row className="centerChilds">
-                {/* <Col span={24} className="centerChilds" style={{padding:5}}>
-                    <Typography.Title level={3}>Admin Menu</Typography.Title>
-                </Col> */}
                 <Col span={24} className="centerChilds" style={{padding:5, marginTop:20}}>
                     <AccountActionDrawer
                         account={props.account}
@@ -182,10 +190,13 @@ const AdminMenu = (props) => {
                         openNotificationWithIcon={props.openNotificationWithIcon}
                         buttonSize={props.buttonSize}
                         drawerWidth={props.drawerWidth}
-                        accountAction="Pause"
-                        objectName="Role"
-                        asyncContractCallback={props.contract.setPausableRolePaused}
-                    />
+                        accountAction="Enable"
+                        objectName="Self Grant Admin"
+                        asyncContractCallback={props.contract.setSelfGrantAdmin}
+                        autoExecute={true}
+                        accountAddress={props.account}
+                        autoRefreshCallback={toggleRefreshData}
+                        />
                 </Col>
                 <Col span={24} className="centerChilds" style={{padding:5}}>
                     <AccountActionDrawer
@@ -194,10 +205,13 @@ const AdminMenu = (props) => {
                         openNotificationWithIcon={props.openNotificationWithIcon}
                         buttonSize={props.buttonSize}
                         drawerWidth={props.drawerWidth}
-                        accountAction="Unpause"
-                        objectName="Role"
-                        asyncContractCallback={props.contract.setPausableRolePaused}
-                    />
+                        accountAction="Disable"
+                        objectName="Self Grant Admin"
+                        asyncContractCallback={props.contract.setSelfGrantAdmin}
+                        autoExecute={true}
+                        accountAddress={props.account}
+                        autoRefreshCallback={toggleRefreshData}
+                        />
                 </Col>
             </Row>
             )

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Drawer, Button } from 'antd';
 import RxData from './RxData';
 
@@ -14,6 +14,12 @@ const ShowRxDrawer = (props) => {
         setVisible(false);
     };
 
+    useEffect ( () => {
+        if (props.account) {
+          onClose();
+        }
+      }, [props.account]);
+  
     return (
         <>
             <Button
@@ -35,27 +41,9 @@ const ShowRxDrawer = (props) => {
                     contract={props.contract}
                     openNotificationWithIcon={props.openNotificationWithIcon}
                     tokenId={props.tokenId}
-                    // rxData={rxData}
-                    // rxTokenURI={rxTokenURI}
+                    parentObjectName={props.parentObjectName}
+                    drawerOnClose={onClose}
                 />
-                {/* { props.parentObjectName === "Patient" && 
-                    <ApprovePharmacist 
-                        account={props.account}
-                        contract={props.contract}
-                        openNotificationWithIcon={props.openNotificationWithIcon}
-                        tokenId={props.tokenId}
-                        parentObjectName={props.parentObjectName}
-                    />
-                } */}
-                {/* { props.parentObjectName === "Pharmacist" && 
-                    <PharmacistBurnAction 
-                        account={props.account}
-                        contract={props.contract}
-                        openNotificationWithIcon={props.openNotificationWithIcon}
-                        tokenId={props.tokenId}
-                        parentObjectName={props.parentObjectName}
-                    />
-                } */}
             </Drawer>
         </>
     );

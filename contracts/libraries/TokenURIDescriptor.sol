@@ -21,31 +21,35 @@ library TokenURIDescriptor {
 
             string memory stringDate = DateTime.timestampToString(rx.date);
             string memory stringBirthdate = DateTime.timestampToString(rx.patient.birthDate);
+            // string memory patientName = string(abi.encodePacked( rx.patient.nameA, rx.patient.nameB ));
 
             // json strings with a Base64 encoded image (SVG) inside
             string[24] memory jsonParts;
-            jsonParts[0]  = '{"name":"';
-            jsonParts[1]  =     name;
-            jsonParts[2]  =     ' #';
-            jsonParts[3]  =     Strings.toString(tokenId);
-            jsonParts[4]  = '","symbol":"';
-            jsonParts[5]  =     symbol;
-            jsonParts[6]  = '","description":"On-Chain NFT Prescriptions"';
-            jsonParts[7]  = ',"attributes":['
+            jsonParts[ 0] = '{"name":"';
+            jsonParts[ 1] =     name;
+            jsonParts[ 2] =     ' #';
+            jsonParts[ 3] =     Strings.toString(tokenId);
+            jsonParts[ 4] = '","symbol":"';
+            jsonParts[ 5] =     symbol;
+            jsonParts[ 6] = '","description":"On-Chain NFT Prescriptions"'
+                             ',"attributes":['
                                 '{"trait_type":"PatientName","value":"';
-            jsonParts[8]  =          rx.patient.name;
-            jsonParts[9]  =     '"},{"trait_type":"Patient Birthdate","value":"';
+            jsonParts[ 7] =         NFTSVG.bytes32ToString(rx.patient.nameA);
+            jsonParts[ 8] =         NFTSVG.bytes32ToString(rx.patient.nameB);
+            jsonParts[ 9] =     '"},{"trait_type":"Patient Birthdate","value":"';
             jsonParts[10] =         stringBirthdate;
             jsonParts[11] =     '"},{"trait_type":"Doctor Name","value":"';
-            jsonParts[12] =         rx.doctorSubject.name;
-            jsonParts[13] =     '"},{"trait_type":"Doctor Degree","value":"';
-            jsonParts[14] =         rx.doctor.degree;
+            jsonParts[12] =         NFTSVG.bytes32ToString(rx.doctorSubject.nameA);
+            jsonParts[13] =         NFTSVG.bytes32ToString(rx.doctorSubject.nameB);
+            jsonParts[14] =     '"},{"trait_type":"Doctor Degree","value":"';
+            jsonParts[15] =         NFTSVG.bytes32ToString(rx.doctor.degree);
             jsonParts[16] =     '"},{"trait_type":"Doctor License","value":"';
-            jsonParts[17] =         rx.doctor.license;
+            jsonParts[17] =         NFTSVG.bytes32ToString(rx.doctor.license);
             jsonParts[18] =     '"},{"trait_type":"RX Date","value":"';
             jsonParts[19] =         stringDate;
-            jsonParts[20] =     '"}]';
-            jsonParts[21] = ',"image": "data:image/svg+xml;base64,';
+            jsonParts[20] =     '"}]'
+                            ',"image": "data:image/svg+xml;base64,';
+            // jsonParts[22] =     '';
             jsonParts[22] =     Base64.encode(bytes(
                                     NFTSVG.generateSVG(tokenId, name, rx)
                                 ));

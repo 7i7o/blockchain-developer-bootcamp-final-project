@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Spin } from 'antd';
+import { parse2Bytes32String, xml1DecodeString } from './utils/stringSanitizer';
 
 const SubjectData = (props) => {
 
@@ -24,19 +25,21 @@ const SubjectData = (props) => {
         
         if (result) {
             let birthDate = new Date(result.birthDate.toNumber() * 1000);// + 0*3*60*60*1000);
+            let sanitizedName = xml1DecodeString(parse2Bytes32String(result.nameA,result.nameB));
+            let sanitizedHomeAddress = xml1DecodeString(parse2Bytes32String(result.homeAddressA,result.homeAddressB));
             setSubjectData({
                             subjectId: result.subjectId,
-                            name: result.name,
+                            name: sanitizedName,
                             birthDate: birthDate,
-                            homeAddress: result.homeAddress
+                            homeAddress: sanitizedHomeAddress
             });
             if (props.stateFull) {
                 props.setResultSubjectId(result.subjectId);
-                props.setResultName(result.name);
+                props.setResultName(sanitizedName);
                 props.setResultBirthDate(birthDate);
-                props.setResultHomeAddress(result.homeAddress);
+                props.setResultHomeAddress(sanitizedHomeAddress);
             }
-            if (result.name && result.name.length) {
+            if (sanitizedName && sanitizedName.length) {
                 props.setExistsSubject(true);
             } else {
                 props.setExistsSubject(false);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button } from 'antd';
 import InlineSVG from 'svg-inline-react';
 
@@ -17,12 +17,19 @@ const ModalNFT = (props) => {
     setIsModalVisible(false);
   };
 
+  useEffect ( () => {
+    if (props.account) {
+      handleCancel();
+    }
+  }, [props.account]);
+
+
   return (
     <>
       <Button
         type="primary"
         onClick={showModal}
-        style={{ marginTop: 20}}
+        style={{ marginBottom: 10 }}
         className='cAlign'
     >
         Load NFT Image

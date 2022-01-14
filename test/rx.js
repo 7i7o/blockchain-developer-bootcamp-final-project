@@ -2,6 +2,21 @@ const Rx = artifacts.require("./Rx.sol");
 
 contract("Rx", accounts => {
 
+  // Helpers
+  const stringToBytes32 = str => web3.utils.padRight(web3.utils.stringToHex(str), 64);
+  
+  const emptyBytes32 = stringToBytes32('');
+  
+  const stringTo2Bytes32 = str => [ stringToBytes32(str), emptyBytes32 ];
+  
+  const castValuesToBytes32 = values => {
+    let ret = [];
+    for (let i = 0; i < values.length; i++) {
+      ret = [ ...ret, ...stringTo2Bytes32(values[i]) ]
+    }
+    return ret;
+  }
+  
   // Define a value to test contract with
   const actors = {
     _owner: accounts[0],
@@ -11,57 +26,70 @@ contract("Rx", accounts => {
     _pharmacist: accounts[4],
     _onlySubject2: accounts[5],
   }
-
+  
   const god = {
     _subjectId: actors._owner,
-    _name: 'Allmighty',
+    _nameA: stringToBytes32('Allmighty'),
     _birthDate: Math.floor((new Date(1970,01,01)) / 1000),
-    _homeAddress: 'The Universe',
+    _homeAddressA: stringToBytes32('The Universe'),
+    _nameB: emptyBytes32,
+    _homeAddressB: emptyBytes32,
   }
   const devil = {
     _subjectId: actors._badActor,
-    _name: 'Belcebu',
+    _nameA: stringToBytes32('Belcebu'),
     _birthDate: Math.floor((new Date(2006,06,06)) / 1000),
-    _homeAddress: 'Hell',
+    _homeAddressA: stringToBytes32('Hell'),
+    _nameB: emptyBytes32,
+    _homeAddressB: emptyBytes32,
   }
   const alice = {
     _subjectId: actors._onlySubject,
-    _name: 'Amy Adams',
+    _nameA: stringToBytes32('Amy Adams'),
     _birthDate: Math.floor((new Date(2001,01,01)) / 1000),
-    _homeAddress: '123 Alice St., Alice City',
+    _homeAddressA: stringToBytes32('123 Alice St., Alice City'),
+    _nameB: emptyBytes32,
+    _homeAddressB: emptyBytes32,
   }
   const ben = {
     _subjectId: actors._doctor,
-    _name: 'Benjamin Button ',
+    _nameA: stringToBytes32('Benjamin Button '),
     _birthDate: Math.floor((new Date(2002,02,02)) / 1000),
-    _homeAddress: '123 Bob St., Bob City',
-    _degree: 'Clinical',
-    _license: '007',
+    _homeAddressA: stringToBytes32('123 Bob St., Bob City'),
+    _degree: stringToBytes32('Clinical'),
+    _license: stringToBytes32('007'),
+    _nameB: emptyBytes32,
+    _homeAddressB: emptyBytes32,
   }
   const carl = {
     _subjectId: actors._pharmacist,
-    _name: 'Carl Collins',
+    _nameA: stringToBytes32('Carl Collins'),
     _birthDate: Math.floor((new Date(2003,03,03)) / 1000),
-    _homeAddress: '123 Carl St., Carl City',
-    _degree: 'Pharm Degree',
-    _license: '420',
+    _homeAddressA: stringToBytes32('123 Carl St., Carl City'),
+    _degree: stringToBytes32('Pharm Degree'),
+    _license: stringToBytes32('420'),
+    _nameB: emptyBytes32,
+    _homeAddressB: emptyBytes32,
   }
   const david = {
     _subjectId: actors._onlySubject2,
-    _name: 'David Donovan',
+    _nameA: stringToBytes32('David Donovan'),
     _birthDate: Math.floor((new Date(2004,04,04)) / 1000),
-    _homeAddress: '123 David St., David City',
+    _homeAddressA: stringToBytes32('123 David St., David City'),
+    _nameB: emptyBytes32,
+    _homeAddressB: emptyBytes32,
   }
 
   const rx1 = {
-    keys: ['Medication', '', '', 'Dosage', 'Route', 'Frequency', 'Quantity', '', 'Refills', 'Diagnosis', '', 'Final key'],
-    values: ['Tylenol', '', '', '1 (one) tablet', 'PO', 'Every 8 hours', '60 tablets', '', '0 Refills', 'Headache', '', 'Final Value'],
+    keys: ['Medication', '', '', 'Dosage', 'Route', 'Frequency', 'Quantity', '', 'Refills', 'Diagnosis', '', 'Final key'].map(stringToBytes32),
+    values: castValuesToBytes32(['Tylenol', '', '', '1 (one) tablet', 'PO', 'Every 8 hours', '60 tablets', '', '0 Refills', 'Headache', '', 'Final Value']),
   }
 
   const rx2 = {
-    keys: ['Medication', '', '', 'Dosage', 'Route', 'Frequency', 'Quantity', '', 'Refills', 'Diagnosis', '', 'Final key'],
-    values: ['Ibuprofen 400mg', '', '', '1 (one) soft pill', 'PO', 'Every 12 hours', '15 pills', '', '0 Refills', 'Mild fever', '', 'Final Value'],
+    keys: ['Medication', '', '', 'Dosage', 'Route', 'Frequency', 'Quantity', '', 'Refills', 'Diagnosis', '', 'Final key'].map(stringToBytes32),
+    values: castValuesToBytes32(['Ibuprofen 400mg', '', '', '1 (one) soft pill', 'PO', 'Every 12 hours', '15 pills', '', '0 Refills', 'Mild fever', '', 'Final Value']),
   }
+
 
   let rxInstance;
   let source;
@@ -77,6 +105,7 @@ contract("Rx", accounts => {
   let finalGas1 = 0;
   let initialGas2 = 0;
   let finalGas2 = 0;
+  let rxData;
 
   // Run this before each test
   beforeEach('setup contract for each test', async function () {
@@ -88,6 +117,7 @@ contract("Rx", accounts => {
     burner = {};
     rx = {};
     uri = '';
+    rxData = {};
   });
 
 
@@ -95,16 +125,16 @@ contract("Rx", accounts => {
     source = alice;
     // Try to create a Subject
     try{
-      await rxInstance.setSubjectData(source._subjectId, source._birthDate, source._name, source._homeAddress, { from: actors._badActor });
+      await rxInstance.setSubjectData(source._subjectId, source._birthDate, source._nameA, source._nameB, source._homeAddressA, source._homeAddressB, { from: actors._badActor });
     } catch (err) { } //console.log(err); }
 
     // Get stored value
     stored = await rxInstance.getSubject.call(source._subjectId);
 
     assert.notEqual(stored.subjectId, source._subjectId, `The address ${source._subjectId} was stored on the Subject.`);
-    assert.notEqual(stored.name, source._name, `The value ${source._name} was stored on the Subject.`);
+    assert.notEqual(stored.nameA, source._nameA, `The value ${source._name} was stored on the Subject.`);
     assert.notEqual(stored.birthDate, source._birthDate, `The value ${source._birthDate} was stored on the Subject.`);
-    assert.notEqual(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was stored on the Subject.`);
+    assert.notEqual(stored.homeAddressA, source._homeAddressA, `The value ${source._homeAddress} was stored on the Subject.`);
   });
 
   it("...should NOT store a doctor when the subject doesn't exist.", async () => {
@@ -142,43 +172,43 @@ contract("Rx", accounts => {
   it("...should store a subject.", async () => {
     source = alice;
     // Create a Subject
-    await rxInstance.setSubjectData(source._subjectId, source._birthDate, source._name, source._homeAddress, { from: actors._owner });
+    await rxInstance.setSubjectData(source._subjectId, source._birthDate, source._nameA, source._nameB, source._homeAddressA, source._homeAddressB, { from: actors._owner });
 
     // Get stored Subject
     stored = await rxInstance.getSubject.call(source._subjectId);
 
     assert.equal(stored.subjectId, source._subjectId, `The address ${source._subjectId} was not stored on the Subject.`);
-    assert.equal(stored.name, source._name, `The value ${source._name} was not stored on the Subject.`);
+    assert.equal(stored.nameA, source._nameA, `The value ${source._name} was not stored on the Subject.`);
     assert.equal(stored.birthDate, source._birthDate, `The value ${source._birthDate} was not stored on the Subject.`);
-    assert.equal(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was not stored on the Subject.`);
+    assert.equal(stored.homeAddressA, source._homeAddressA, `The value ${source._homeAddress} was not stored on the Subject.`);
   });
 
   it("...should store another subject.", async () => {
     source = ben;
     // Create a Subject
-    await rxInstance.setSubjectData(source._subjectId, source._birthDate, source._name, source._homeAddress, { from: actors._owner });
+    await rxInstance.setSubjectData(source._subjectId, source._birthDate, source._nameA, source._nameB, source._homeAddressA, source._homeAddressB, { from: actors._owner });
 
     // Get stored Subject
     stored = await rxInstance.getSubject.call(source._subjectId);
 
     assert.equal(stored.subjectId, source._subjectId, `The address ${source._subjectId} was not stored on the Subject.`);
-    assert.equal(stored.name, source._name, `The value ${source._name} was not stored on the Subject.`);
+    assert.equal(stored.nameA, source._nameA, `The value ${source._name} was not stored on the Subject.`);
     assert.equal(stored.birthDate, source._birthDate, `The value ${source._birthDate} was not stored on the Subject.`);
-    assert.equal(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was not stored on the Subject.`);
+    assert.equal(stored.homeAddressA, source._homeAddressA, `The value ${source._homeAddress} was not stored on the Subject.`);
   });
 
   it("...should store yet another subject.", async () => {
     source = carl;
     // Create a Subject
-    await rxInstance.setSubjectData(source._subjectId, source._birthDate, source._name, source._homeAddress, { from: actors._owner });
+    await rxInstance.setSubjectData(source._subjectId, source._birthDate, source._nameA, source._nameB, source._homeAddressA, source._homeAddressB, { from: actors._owner });
 
     // Get stored Subject
     stored = await rxInstance.getSubject.call(source._subjectId);
 
     assert.equal(stored.subjectId, source._subjectId, `The address ${source._subjectId} was not stored on the Subject.`);
-    assert.equal(stored.name, source._name, `The value ${source._name} was not stored on the Subject.`);
+    assert.equal(stored.nameA, source._nameA, `The value ${source._name} was not stored on the Subject.`);
     assert.equal(stored.birthDate, source._birthDate, `The value ${source._birthDate} was not stored on the Subject.`);
-    assert.equal(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was not stored on the Subject.`);
+    assert.equal(stored.homeAddressA, source._homeAddressA, `The value ${source._homeAddress} was not stored on the Subject.`);
   });
 
   it("...should NOT store a doctor without admin role.", async () => {
@@ -251,15 +281,15 @@ contract("Rx", accounts => {
   it("...should store yet yet another subject.", async () => {
     source = david;
     // Create a Subject
-    await rxInstance.setSubjectData(source._subjectId, source._birthDate, source._name, source._homeAddress, { from: actors._owner });
+    await rxInstance.setSubjectData(source._subjectId, source._birthDate, source._nameA, source._nameB, source._homeAddressA, source._homeAddressB, { from: actors._owner });
 
     // Get stored Subject
     stored = await rxInstance.getSubject.call(source._subjectId);
 
     assert.equal(stored.subjectId, source._subjectId, `The address ${source._subjectId} was not stored on the Subject.`);
-    assert.equal(stored.name, source._name, `The value ${source._name} was not stored on the Subject.`);
+    assert.equal(stored.nameA, source._nameA, `The value ${source._name} was not stored on the Subject.`);
     assert.equal(stored.birthDate, source._birthDate, `The value ${source._birthDate} was not stored on the Subject.`);
-    assert.equal(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was not stored on the Subject.`);
+    assert.equal(stored.homeAddressA, source._homeAddressA, `The value ${source._homeAddress} was not stored on the Subject.`);
   });
 
   it("...should NOT mint prescription (not a doctor)", async () => {
@@ -314,7 +344,7 @@ contract("Rx", accounts => {
     try {
       tokenURI = await rxInstance.mint(patient._subjectId, rx.keys, rx.values, { from: minter._subjectId });
       uri = await rxInstance.tokenURI(1);
-    } catch (err) { } //console.log(err); }
+    } catch (err) { console.log(err); }
 
     assert.notEqual(uri, '', `The tokenURI should have been generated, but was stored as: \n"${uri}"\n`);
 
@@ -460,10 +490,10 @@ contract("Rx", accounts => {
     assert.equal(uri, '', `burn prescription 3 threw Error`);
 
     try {
-      uri = await rxInstance.tokenURI(3);
-    } catch (err) { uri = 'b' }
+      rxData = await rxInstance.getRx(3);
+    } catch (err) { rxData = 'b' }
 
-    assert.equal(uri, 'b', `The tokenURI should NOT be available after burn`);
+    assert.equal(rxData.pharmacist.subjectId, burner._subjectId, `The pharmacists who burned the rx should have been stored`);
 
   });
 
@@ -478,9 +508,9 @@ contract("Rx", accounts => {
     stored = await rxInstance.getSubject.call(source._subjectId);
 
     assert.equal(stored.subjectId, source._subjectId, `The address ${source._subjectId} was removed.`);
-    assert.equal(stored.name, source._name, `The value ${source._name} was removed.`);
+    assert.equal(stored.nameA, source._nameA, `The value ${source._name} was removed.`);
     assert.equal(stored.birthDate, source._birthDate, `The value ${source._birthDate} was removed.`);
-    assert.equal(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was removed.`);
+    assert.equal(stored.homeAddressA, source._homeAddressA, `The value ${source._homeAddress} was removed.`);
   });
 
   it("...should NOT remove a doctor without admin role.", async () => {
@@ -524,9 +554,9 @@ contract("Rx", accounts => {
     stored = await rxInstance.getSubject.call(source._subjectId);
 
     assert.equal(stored.subjectId, source._subjectId, `The address ${source._subjectId} was removed.`);
-    assert.equal(stored.name, source._name, `The value ${source._name} was removed.`);
+    assert.equal(stored.nameA, source._nameA, `The value ${source._name} was removed.`);
     assert.equal(stored.birthDate, source._birthDate, `The value ${source._birthDate} was removed.`);
-    assert.equal(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was removed.`);
+    assert.equal(stored.homeAddressA, source._homeAddressA, `The value ${source._homeAddress} was removed.`);
 
   });
 
@@ -541,9 +571,9 @@ contract("Rx", accounts => {
     stored = await rxInstance.getSubject.call(source._subjectId);
 
     assert.equal(stored.subjectId, source._subjectId, `The address ${source._subjectId} was removed.`);
-    assert.equal(stored.name, source._name, `The value ${source._name} was removed.`);
+    assert.equal(stored.nameA, source._nameA, `The value ${source._name} was removed.`);
     assert.equal(stored.birthDate, source._birthDate, `The value ${source._birthDate} was removed.`);
-    assert.equal(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was removed.`);
+    assert.equal(stored.homeAddressA, source._homeAddressA, `The value ${source._homeAddress} was removed.`);
 
   });
 
@@ -633,9 +663,9 @@ contract("Rx", accounts => {
     stored = await rxInstance.getSubject.call(source._subjectId);
 
     assert.notEqual(stored.subjectId, source._subjectId, `The address ${source._subjectId} was not removed.`);
-    assert.notEqual(stored.name, source._name, `The value ${source._name} was not removed.`);
+    assert.notEqual(stored.nameA, source._nameA, `The value ${source._name} was not removed.`);
     assert.notEqual(stored.birthDate, source._birthDate, `The value ${source._birthDate} was not removed.`);
-    assert.notEqual(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was not removed.`);
+    assert.notEqual(stored.homeAddressA, source._homeAddressA, `The value ${source._homeAddress} was not removed.`);
 
   });
 
@@ -650,9 +680,9 @@ contract("Rx", accounts => {
     stored = await rxInstance.getSubject.call(source._subjectId);
 
     assert.notEqual(stored.subjectId, source._subjectId, `The address ${source._subjectId} was not removed.`);
-    assert.notEqual(stored.name, source._name, `The value ${source._name} was not removed.`);
+    assert.notEqual(stored.nameA, source._nameA, `The value ${source._name} was not removed.`);
     assert.notEqual(stored.birthDate, source._birthDate, `The value ${source._birthDate} was not removed.`);
-    assert.notEqual(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was not removed.`);
+    assert.notEqual(stored.homeAddressA, source._homeAddressA, `The value ${source._homeAddress} was not removed.`);
 
   });
 
@@ -667,9 +697,9 @@ contract("Rx", accounts => {
     stored = await rxInstance.getSubject.call(source._subjectId);
 
     assert.notEqual(stored.subjectId, source._subjectId, `The address ${source._subjectId} was not removed.`);
-    assert.notEqual(stored.name, source._name, `The value ${source._name} was not removed.`);
+    assert.notEqual(stored.nameA, source._nameA, `The value ${source._name} was not removed.`);
     assert.notEqual(stored.birthDate, source._birthDate, `The value ${source._birthDate} was not removed.`);
-    assert.notEqual(stored.homeAddress, source._homeAddress, `The value ${source._homeAddress} was not removed.`);
+    assert.notEqual(stored.homeAddressA, source._homeAddressA, `The value ${source._homeAddress} was not removed.`);
 
   });
 
